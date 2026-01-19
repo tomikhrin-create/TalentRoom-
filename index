@@ -1,0 +1,852 @@
+import React, { useEffect, useMemo, useRef, useState } from "react";
+
+/**
+ * TALENT ROOM — CRO Landing (Czech)
+ * Full rewrite to sandbox all names and stop duplicate-var collisions like
+ * "Can't create duplicate variable: '_0x2bcb81'".
+ *
+ * How it avoids collisions:
+ * - Everything (constants, helpers, components) lives inside an IIFE closure
+ *   that returns the App component; at top-level we only have the import and
+ *   a single `export default (...)` expression. No global `var/let/const`.
+ * - No global <style> tags or CSS keyframes that some bundlers obfuscate.
+ * - JSX strictly paired/closed; no stray tags.
+ * - Small runtime "tests" via console.assert after mount to sanity-check DOM.
+ */
+
+const TR_App = (() => {
+  // ---------------- Settings & Colors (scoped in closure) ----------------
+  const COLORS = {
+    bg: "#000000",
+    neonGold: "#FFD700",
+    neonGreen: "#39FF14",
+    red: "#dc2626",
+  };
+
+  const SETTINGS = {
+    campaign: {
+      headline:
+        "Talent Room: trénuj a vystupuj. Nonstop studio, 4 decky, nahrávání + komunita.",
+      sub: "Jen pro 20 členů!",
+      deadlineISO: "2025-09-30T23:59:59",
+      totalSeats: 20,
+      starterSeatsLeft: 10,
+      performerSeatsLeft: 8,
+    },
+    ctaLinkStarter: "#pricing-starter",
+    ctaLinkPerformer: "#pricing-performer",
+    assets: {
+      logo: null,
+      heroVideo: null,
+      heroPoster: null,
+      heroBg: null,
+      studio: null,
+      camera: null,
+      decks: null,
+    },
+  };
+
+  // ---------------- Helpers ----------------
+  function useCountdown(targetISO) {
+    const target = useMemo(() => new Date(targetISO).getTime(), [targetISO]);
+    const [timeLeft, setTimeLeft] = useState(() => Math.max(0, target - Date.now()));
+    useEffect(() => {
+      const id = setInterval(() => setTimeLeft(Math.max(0, target - Date.now())), 1000);
+      return () => clearInterval(id);
+    }, [target]);
+    const s = Math.floor(timeLeft / 1000);
+    const d = Math.floor(s / 86400);
+    const h = Math.floor((s % 86400) / 3600);
+    const m = Math.floor((s % 3600) / 60);
+    const sec = s % 60;
+    return { d, h, m, sec, finished: s <= 0 };
+  }
+
+  function ImageSlot({ src, label }) {
+    return (
+      <div
+        className="aspect-[16/9] w-full rounded-xl overflow-hidden bg-white/5 flex items-center justify-center text-white/70"
+        style={{ boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.08)" }}
+      >
+        {src ? (
+          <img
+            src={src}
+            alt={label}
+            loading="lazy"
+            decoding="async"
+            width={1600}
+            height={900}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <span className="text-sm">{label} – sem přijde fotka</span>
+        )}
+      </div>
+    );
+  }
+
+  // ---------------- JS-driven marquee (no CSS @keyframes) ----------------
+  const CAROUSEL_ITEMS = [
+    "🛡️ 30 dní. Buď to miluješ, nebo vracíme cash.",
+    "🎧 Skool platforma: tvoje nonstop DJ komunita 24/7.",
+    "🔥 New Music Drops každý týden.",
+    "🎹 Producers Packs: hot zvuky, co ti zvednou level.",
+    "⚡ Tipy & triky, co ti zkrátí roky učení na týdny.",
+    "🤝 Networking: poznej DJs, se kterými můžeš růst.",
+    "📅 Rezervační systém: studio ready, kdy chceš ty.",
+    "🏆 Contesty o festivaly a real vystoupení.",
+  ];
+
+  function Marquee({ items = CAROUSEL_ITEMS }) {
+    const wrapRef = useRef(null);
+    const innerRef = useRef(null);
+
+    useEffect(() => {
+      const wrap = wrapRef.current;
+      const inner = innerRef.current;
+      if (!wrap || !inner) return;
+
+      let rafId = 0;
+      let x = 0;
+      const step = () => {
+        x -= 1.4; // faster scroll (px per frame, was 0.5)
+        if (inner.scrollWidth > 0) {
+          if (-x >= inner.scrollWidth / 2) x = 0;
+        }
+        inner.style.transform = `translateX(${x}px)`;
+        rafId = requestAnimationFrame(step);
+      };
+      rafId = requestAnimationFrame(step);
+      return () => cancelAnimationFrame(rafId);
+    }, [items]);
+
+    const text = items.join("   •   ");
+    return (
+      <div
+        className="mt-7 w-full max-w-4xl mx-auto rounded-2xl border px-0 py-0 overflow-hidden"
+        style={{
+          borderColor: COLORS.neonGold,
+          boxShadow: "0 0 22px rgba(255,215,0,0.35)",
+          background: "#0b0b0b",
+        }}
+        role="region"
+        aria-label="informativní karusel"
+      >
+        <div className="relative h-9 md:h-10 overflow-hidden" ref={wrapRef}>
+          <div
+            className="pointer-events-none absolute inset-y-0 left-0 w-10"
+            style={{ background: "linear-gradient(90deg, #0b0b0b, rgba(11,11,11,0))" }}
+          />
+          <div
+            className="pointer-events-none absolute inset-y-0 right-0 w-10"
+            style={{ background: "linear-gradient(270deg, #0b0b0b, rgba(11,11,11,0))" }}
+          />
+          <div
+            ref={innerRef}
+            className="whitespace-nowrap font-semibold text-white text-sm md:text-base leading-9 md:leading-10 will-change-transform"
+            style={{ display: "inline-block", paddingLeft: "100%" }}
+            aria-live="off"
+          >
+            <span className="inline-block pr-12">{text}</span>
+            <span className="inline-block pr-12">{text}</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ---------------- Partners scroller (JS) ----------------
+  function LogosScroller() {
+    const wrapRef = useRef(null);
+    const innerRef = useRef(null);
+
+    useEffect(() => {
+      const wrap = wrapRef.current;
+      const inner = innerRef.current;
+      if (!wrap || !inner) return;
+      let rafId = 0;
+      let x = 0;
+      const step = () => {
+        x -= 1.2;
+        if (inner.scrollWidth > 0) {
+          if (-x >= inner.scrollWidth / 2) x = 0;
+        }
+        inner.style.transform = `translateX(${x}px)`;
+        rafId = requestAnimationFrame(step);
+      };
+      rafId = requestAnimationFrame(step);
+      return () => cancelAnimationFrame(rafId);
+    }, []);
+
+    const logos = Array.from({ length: 8 }).map((_, idx) => (
+      <span
+        key={`logo-${idx}`}
+        className="inline-flex items-center justify-center mx-8 w-28 h-12 bg-white/5 rounded-md text-white/70 text-xs"
+      >
+        Logo {idx + 1}
+      </span>
+    ));
+
+    return (
+      <div className="mt-4 relative overflow-hidden rounded-2xl border" style={{ borderColor: "#ffffff22" }}>
+        <div ref={wrapRef} className="overflow-hidden">
+          <div ref={innerRef} className="whitespace-nowrap py-4 will-change-transform">
+            {logos}
+            {logos}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ---------------- Glow utilities (interactive neon glow following cursor) ----------------
+  function hexToRgbA(hex, alpha = 0.6) {
+    if (!hex) return `rgba(255,255,255,${alpha})`;
+    const h = (hex || "").replace("#", "");
+    const bigint = parseInt(h, 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+  function GlowCard({ color = COLORS.neonGold, children }) {
+    const ref = useRef(null);
+    const [glow, setGlow] = useState({ x: 0, y: 0, show: false });
+
+    const onMove = (e) => {
+      const el = ref.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      setGlow({ x, y, show: true });
+    };
+    const onLeave = () => setGlow((g) => ({ ...g, show: false }));
+
+    const glowBg = `radial-gradient(200px 200px at ${glow.x}px ${glow.y}px, ${hexToRgbA(
+      color,
+      0.35
+    )}, transparent 60%)`;
+
+    return (
+      <div
+        ref={ref}
+        onMouseMove={onMove}
+        onMouseEnter={() => setGlow((g) => ({ ...g, show: true }))}
+        onMouseLeave={onLeave}
+        className="relative rounded-2xl"
+        style={{
+          boxShadow: glow.show
+            ? `0 0 28px ${hexToRgbA(color, 0.55)}`
+            : "0 0 14px rgba(255,255,255,0.06)",
+          transition: "box-shadow 160ms ease",
+        }}
+      >
+        {/* dynamic glow layer */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 rounded-2xl"
+          style={{
+            background: glow.show ? glowBg : "transparent",
+            mixBlendMode: "screen",
+            transition: "background 120ms ease",
+          }}
+        />
+        {/* content */}
+        <div className="relative rounded-2xl overflow-hidden">{children}</div>
+      </div>
+    );
+  }
+
+  // ---------------- App Component ----------------
+  function TR_AppInner() {
+    const { finished } = useCountdown(SETTINGS.campaign.deadlineISO);
+    const totalSeats = SETTINGS.campaign.totalSeats;
+    const seatsLeft =
+      SETTINGS.campaign.starterSeatsLeft + SETTINGS.campaign.performerSeatsLeft;
+    const percent = Math.min(
+      100,
+      Math.round(((totalSeats - seatsLeft) / totalSeats) * 100)
+    );
+
+    // Runtime sanity checks (simple "tests")
+    useEffect(() => {
+      // Defer asserts to next tick to ensure DOM painted
+      const id = requestAnimationFrame(() => {
+        console.assert(
+          document.querySelector("#pricing-starter"),
+          "Test: #pricing-starter existuje"
+        );
+        console.assert(
+          document.querySelector("#pricing-performer"),
+          "Test: #pricing-performer existuje"
+        );
+      });
+      return () => cancelAnimationFrame(id);
+    }, []);
+
+    return (
+      <section
+        className="w-full text-white text-[15.5px] md:text-[16.5px]"
+        style={{ background: "linear-gradient(180deg,#1a1a1a,#0e0e0e)" }}
+      >
+        {/* TOP HEADER */}
+        <header className="w-full border-b border-white/10">
+          <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {SETTINGS.assets && SETTINGS.assets.logo ? (
+                <img src={SETTINGS.assets.logo} alt="Talent Room" className="h-7 w-auto" />
+              ) : (
+                <span className="text-white font-extrabold tracking-wide">
+                  TALENT ROOM
+                </span>
+              )}
+            </div>
+            <div
+              className="inline-flex items-center gap-2 text-xs sm:text-sm px-3 py-1.5 rounded-full border"
+              style={{
+                borderColor: "#ffffff33",
+                background: "rgba(255,255,255,0.06)",
+              }}
+            >
+              <span className="text-white/80">Přihlas se do</span>
+              <span className="font-semibold text-white">23:59</span>
+            </div>
+          </div>
+        </header>
+
+        {/* HERO */}
+        <div className="max-w-6xl mx-auto px-6 pt-16 pb-10 text-center">
+          <div
+            className="inline-flex items-center gap-2 rounded-full px-4 py-1 text-sm mb-5 border"
+            style={{
+              borderColor: `${COLORS.neonGold}40`,
+              background: "rgba(255,215,0,0.06)",
+              color: COLORS.neonGold,
+              boxShadow: "0 0 18px rgba(255,215,0,0.25)",
+            }}
+          >
+            <span>🔥</span> {SETTINGS.campaign.sub}
+          </div>
+          <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight leading-snug">
+            Staň se DJem, kterého lidi chtějí slyšet.
+          </h1>
+          <p className="mt-3 max-w-xl mx-auto text-sm md:text-base text-white/90 leading-relaxed">
+            Objev skutečný způsob, jak růst rychleji a stát se DJem, co má respekt.
+          </p>
+
+          {/* Video with blurred background */}
+          <div className="mt-6">
+            <div className="relative w-full max-w-4xl mx-auto rounded-2xl overflow-hidden">
+              {SETTINGS.assets && SETTINGS.assets.heroBg ? (
+                <img
+                  src={SETTINGS.assets.heroBg}
+                  alt=""
+                  aria-hidden
+                  className="absolute inset-0 w-full h-full object-cover"
+                  style={{ filter: "blur(16px)", transform: "scale(1.08)", opacity: 0.55 }}
+                />
+              ) : (
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background:
+                      "radial-gradient(1200px 300px at 50% 0%, rgba(255,215,0,0.18), transparent 60%), radial-gradient(800px 300px at 50% 100%, rgba(57,255,20,0.12), transparent 60%), linear-gradient(180deg,#0b0b0b,#080808)",
+                  }}
+                />
+              )}
+              <div
+                className="pointer-events-none absolute inset-0"
+                style={{ boxShadow: "inset 0 0 120px rgba(0,0,0,0.65)" }}
+              />
+              <div className="relative">
+                {SETTINGS.assets && SETTINGS.assets.heroVideo ? (
+                  <video
+                    controls
+                    playsInline
+                    className="w-full aspect-video block"
+                    poster={(SETTINGS.assets && SETTINGS.assets.heroPoster) || undefined}
+                  >
+                    <source src={SETTINGS.assets.heroVideo} />
+                  </video>
+                ) : (
+                  <div className="w-full aspect-video flex items-center justify-center text-white/80">
+                    Nahraj promo video (hero) – nahoře nad garancí
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Social proof bubbles */}
+          <div className="mt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <div
+              className="px-3 py-1.5 rounded-full border text-xs sm:text-sm font-semibold"
+              style={{ borderColor: `#ffffff55`, color: "#fff", boxShadow: "0 0 12px rgba(255,255,255,0.08)" }}
+            >
+              ⭐️ Hodnocení 5.0
+            </div>
+            <div
+              className="px-3 py-1.5 rounded-full border text-xs sm:text-sm font-semibold"
+              style={{ borderColor: `${COLORS.neonGreen}55`, color: COLORS.neonGreen, boxShadow: "0 0 12px rgba(57,255,20,0.25)" }}
+            >
+              👥 20+ lidí v aktivní komunitě
+            </div>
+            <div
+              className="px-3 py-1.5 rounded-full border text-xs sm:text-sm font-semibold"
+              style={{ borderColor: `${COLORS.neonGold}55`, color: COLORS.neonGold, boxShadow: "0 0 12px rgba(255,215,0,0.25)" }}
+            >
+              💸 80% levnější než kdy jindy
+            </div>
+          </div>
+
+          {/* Rotating info carousel banner */}
+          <Marquee />
+
+          {/* Seats progress */}
+          <div className="mt-7 max-w-xl mx-auto text-left">
+            <div className="flex items-center justify-between text-sm mb-2 text-white">
+              <span className="inline-flex items-center gap-2">
+                👥 Zbývá {seatsLeft} / {totalSeats} míst
+              </span>
+              <span>{percent}% obsazeno</span>
+            </div>
+            <div className="h-2 w-full rounded-full overflow-hidden bg-white/10">
+              <div
+                className="h-full"
+                style={{
+                  width: `${percent}%`,
+                  background: `linear-gradient(90deg, ${COLORS.neonGreen}, ${COLORS.neonGold})`,
+                  boxShadow: "0 0 14px rgba(255,215,0,0.35)",
+                }}
+              />
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div className="mt-7 flex items-center justify-center gap-3">
+            <a
+              href={SETTINGS.ctaLinkStarter}
+              className="rounded-2xl px-6 py-3 font-semibold transition duration-200 transform hover:-translate-y-0.5 active:translate-y-0 hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#39FF14] focus:ring-offset-black"
+              style={{ background: COLORS.neonGreen, color: "#0a0a0a", boxShadow: "0 0 18px rgba(57,255,20,0.5)" }}
+            >
+              Získat nabídku BASIC
+            </a>
+            <a
+              href={SETTINGS.ctaLinkPerformer}
+              className="rounded-2xl px-6 py-3 font-bold transition duration-200 transform hover:-translate-y-0.5 active:translate-y-0 hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FFD700] focus:ring-offset-black"
+              style={{ background: COLORS.neonGold, color: "#0a0a0a", boxShadow: "0 0 22px rgba(255,215,0,0.6)" }}
+            >
+              Získat nabídku PERFORMER
+            </a>
+          </div>
+        </div>
+
+        {/* SECTION: Jak právě tobě… */}
+        <div className="max-w-6xl mx-auto px-6 pb-10">
+          <h2
+            className="text-2xl md:text-4xl font-extrabold text-center uppercase text-transparent bg-clip-text tracking-tight"
+            style={{ backgroundImage: "linear-gradient(90deg,#FFFFFF,#FFD700)" }}
+          >
+            Jak právě tobě můžeme pomoci?
+          </h2>
+          <p className="mt-3 max-w-3xl mx-auto text-base md:text-lg text-white/90 text-center leading-relaxed">
+            Náš závazek je dát ti nejlepší prostředí a příležitosti. S našimi
+            zkušenostmi a technikou jsi na správné cestě stát se úspěšným DJem.
+          </p>
+          <div className="mt-6 grid md:grid-cols-2 gap-6 items-stretch">
+            {/* Left: framed text */}
+            <div
+              className="rounded-2xl p-6 text-left"
+              style={{
+                background: "rgba(18,18,18,0.6)",
+                backdropFilter: "blur(8px)",
+                boxShadow:
+                  "inset 0 0 0 1px rgba(255,255,255,0.08), 0 0 14px rgba(255,255,255,0.06)",
+              }}
+            >
+              <div className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
+                Proč většina DJů neroste?
+              </div>
+              <p className="mt-3 text-white/90 text-base md:text-lg leading-relaxed">
+                Protože trénují doma. A doma se nikdo neposouvá.
+              </p>
+              <ul className="mt-5 space-y-2 text-white/90 text-base md:text-lg list-none leading-relaxed">
+                <li>⏱️ žádná disciplína</li>
+                <li>🗣️ žádný feedback</li>
+                <li>👥 žádná komunita</li>
+                <li>🏆 žádné contesty</li>
+                <li>🎤 žádné šance hrát venku</li>
+                <li>🕰️ roky stagnace</li>
+              </ul>
+              <div className="mt-6 text-lg md:text-xl font-semibold text-white">
+                Největší problém DJů není talent.
+                <br />
+                Je to prostředí.
+              </div>
+            </div>
+            {/* Right: photo */}
+            <div className="rounded-2xl overflow-hidden">
+              <ImageSlot src={SETTINGS.assets.studio} label="Tvoje nové prostředí – studio Talent Room" />
+            </div>
+          </div>
+        </div>
+
+        {/* GROW FASTER (left photos, right text) */}
+        <div className="max-w-6xl mx-auto px-6 pb-12">
+          <div className="grid md:grid-cols-2 gap-6 items-stretch">
+            {/* Left: photos */}
+            <div className="grid grid-cols-1 gap-4">
+              <ImageSlot src={SETTINGS.assets.studio} label="24/7 studio – hlavní místnost" />
+              <div className="grid grid-cols-2 gap-4">
+                <ImageSlot src={SETTINGS.assets.decks} label="CDJ setup – 4 decky" />
+                <ImageSlot src={SETTINGS.assets.camera} label="Nahrávání + kamera" />
+              </div>
+            </div>
+            {/* Right: text */}
+            <div
+              className="rounded-2xl p-6 text-left"
+              style={{
+                background: "rgba(18,18,18,0.6)",
+                backdropFilter: "blur(8px)",
+                boxShadow:
+                  "inset 0 0 0 1px rgba(255,255,255,0.08), 0 0 14px rgba(255,255,255,0.06)",
+              }}
+            >
+              <h3 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
+                Prostředí, kde rosteš rychleji!
+              </h3>
+              <ul className="mt-5 space-y-2 text-white/90 text-base md:text-lg leading-relaxed">
+                <li>🎛 <strong>24/7 studio ve Fabricu</strong></li>
+                <li>🧭 <strong>Mentoring od DJe</strong>, který hraje <em>Colours, B4L</em>, velké stage</li>
+                <li>👥 <strong>Komunita</strong> lidí, co jedou stejně jako ty</li>
+                <li>⚔️ <strong>Challenge</strong> každý měsíc</li>
+                <li>🔊 <strong>Feedback</strong>, který doma neuslyšíš</li>
+                <li>🏆 <strong>Contesty</strong> o reálné stage sloty</li>
+                <li>🎤 <strong>Cesta</strong> k reálným gigs</li>
+              </ul>
+              <div className="mt-6 text-lg md:text-xl font-semibold text-white">
+                Tady nejde o místnost.
+                <br />
+                Tady jde o tvoji DJ verzi 2.0.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* PRICING / CHECKOUT */}
+        <div className="max-w-6xl mx-auto px-6 pb-6">
+          <h2
+            className="text-2xl md:text-4xl font-extrabold text-center uppercase text-transparent bg-clip-text tracking-tight"
+            style={{ backgroundImage: "linear-gradient(90deg,#FFFFFF,#FFD700)" }}
+          >
+            Vyber si svou úroveň
+          </h2>
+        </div>
+        <div id="pricing" className="max-w-6xl mx-auto px-6 pb-12 grid md:grid-cols-2 gap-6">
+          {/* BASIC (Starter) */}
+          <GlowCard color={COLORS.neonGreen}>
+            <div
+              id="pricing-starter"
+              className="rounded-2xl overflow-hidden"
+              style={{
+                background: "rgba(18,18,18,0.6)",
+                backdropFilter: "blur(8px)",
+                boxShadow:
+                  "inset 0 0 0 1px rgba(255,255,255,0.08), 0 0 14px rgba(255,255,255,0.06)",
+              }}
+            >
+              <div className="p-6 space-y-2">
+                <div
+                  className="text-sm uppercase tracking-wider"
+                  style={{ color: COLORS.neonGreen, textShadow: "0 0 16px rgba(57,255,20,0.55)" }}
+                >
+                  BASIC DJ
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold text-white">
+                  Pro ty, co chtějí skill, prostředí a jistý progres.
+                </h3>
+                <div className="text-sm md:text-base text-white/90">
+                  <div>
+                    3 měsíce jen za <span className="font-extrabold" style={{ color: COLORS.neonGreen }}>3 899 Kč</span>{" "}
+                    <span style={{ color: COLORS.red }}>(15% sleva)</span>
+                  </div>
+                  <div>
+                    Měsíční členství jen za <span className="font-extrabold" style={{ color: COLORS.neonGold }}>1 499 Kč</span>
+                  </div>
+                </div>
+                <div className="inline-flex items-center gap-2 text-xs sm:text-sm mt-1" style={{ color: COLORS.neonGreen }}>
+                  🛡️ Pokud po 30 dnech necítíš progres → vrátíme ti peníze.
+                </div>
+              </div>
+              <div className="p-6 space-y-4">
+                <ul className="space-y-1.5 text-white/90 text-sm">
+                  <li>🎛 24/7 studio ve Fabricu</li>
+                  <li>📲 Rezervace přes appku</li>
+                  <li>💬 DJ komunita (motivace nonstop)</li>
+                  <li>🎧 Základní online content (tipy, set building, guidance)</li>
+                  <li>⚔️ Měsíční DJ Challenge</li>
+                  <li>👁 Mini feedback na tvůj progress</li>
+                  <li>🚀 Prostředí, které tě nutí růst</li>
+                </ul>
+                <div className="my-3 h-px bg-white/10" />
+                <div className="pt-1 text-white/90">
+                  <div>
+                    <span className="text-white/70">Hodnota (za vše výše):</span>{" "}
+                    <span className="font-semibold">4 000 Kč</span>
+                  </div>
+                  <div className="mt-1">
+                    <span className="text-white/70">Tvoje cena (členství):</span>{" "}
+                    <span className="font-bold" style={{ color: COLORS.neonGreen }}>1 500 Kč</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="text-xs sm:text-sm" style={{ color: COLORS.red }}>
+                    Zbývá míst: <span className="font-semibold">{SETTINGS.campaign.starterSeatsLeft}</span>
+                  </div>
+                  <a
+                    href={SETTINGS.ctaLinkStarter}
+                    className="rounded-2xl px-6 py-2 font-semibold transition duration-200 transform hover:-translate-y-0.5 active:translate-y-0 hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#39FF14] focus:ring-offset-black"
+                    style={{ background: COLORS.neonGreen, color: "#0a0a0a", boxShadow: "0 0 18px rgba(57,255,20,0.5)" }}
+                  >
+                    👉 Získat nabídku BASIC
+                  </a>
+                </div>
+              </div>
+            </div>
+          </GlowCard>
+
+          {/* PERFORMER (PRO) */}
+          <GlowCard color={COLORS.neonGold}>
+            <div
+              id="pricing-performer"
+              className="rounded-2xl overflow-hidden"
+              style={{
+                background: "rgba(18,18,18,0.6)",
+                backdropFilter: "blur(8px)",
+                boxShadow:
+                  "inset 0 0 0 1px rgba(255,255,255,0.08), 0 0 14px rgba(255,255,255,0.06)",
+              }}
+            >
+              <div className="p-6 space-y-2">
+                <div
+                  className="text-sm uppercase tracking-wider"
+                  style={{ color: COLORS.neonGold, textShadow: "0 0 16px rgba(255,215,0,0.55)" }}
+                >
+                  Performer DJ — PRO
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold text-white">
+                  Pro ty, kteří chtějí status, viditelnost a reálné stage příležitosti.
+                </h3>
+                <div className="text-xs sm:text-sm" style={{ color: COLORS.red }}>
+                  LIMIT 10 lidí — po naplnění čekací list
+                </div>
+                <div className="text-sm md:text-base text-white/90 mt-1">
+                  <div>
+                    3 měsíce jen za <span className="font-extrabold" style={{ color: COLORS.neonGold }}>6 299 Kč</span>{" "}
+                    <span style={{ color: COLORS.red }}>(15% sleva)</span>
+                  </div>
+                  <div>
+                    Měsíční členství jen za <span className="font-extrabold" style={{ color: COLORS.neonGold }}>2 499 Kč</span>
+                  </div>
+                </div>
+                <div className="inline-flex items-center gap-2 text-xs sm:text-sm mt-1" style={{ color: COLORS.neonGold }}>
+                  🛡️ PRO Garance: Pokud do 90 dní nebudeš připraven soutěžit o stage sloty → dostaneš měsíc PRO zdarma.
+                </div>
+              </div>
+              <div className="p-6 space-y-4">
+                <div className="text-sm mb-2" style={{ color: COLORS.neonGreen }}>
+                  Získáš vše z BASIC + navíc:
+                </div>
+                <ul className="space-y-1.5 text-white/90 text-sm">
+                  <li>
+                    🔥 <strong>PREMIUM content</strong>: new music drops, producer packs, special edits, svatební hudba, advance tips
+                  </li>
+                  <li>🎛 <strong>Priority booking</strong> (přednost před BASIC)</li>
+                  <li>🧠 <strong>Hluboký měsíční feedback</strong> (rozbor setu, energie, flow)</li>
+                  <li>🥷 <strong>Uzavřená PRO Discord sekce</strong></li>
+                  <li>🏆 <strong>Přednost v contestech</strong> na reálné stage</li>
+                  <li>🎤 <strong>GIG TRACK</strong> – cesta, jak se dostaneš na stage venku</li>
+                  <li>🎫 <strong>Backstage Meet & Learn</strong> sessions</li>
+                  <li>📸 <strong>Viditelnost</strong>: stories, videa, promo záběry</li>
+                  <li>🏅 <strong>PRO Badge</strong> — status v komunitě</li>
+                </ul>
+                <div className="my-3 h-px bg-white/10" />
+                <div className="pt-1 text-white/90">
+                  <div>
+                    <span className="text-white/70">Hodnota (za vše výše):</span>{" "}
+                    <span className="font-semibold">8 000 Kč</span>
+                  </div>
+                  <div className="mt-1">
+                    <span className="text-white/70">Tvoje cena (členství):</span>{" "}
+                    <span className="font-bold" style={{ color: COLORS.neonGold }}>2 500 Kč</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="text-xs sm:text-sm" style={{ color: COLORS.red }}>
+                    Zbývá míst: <span className="font-semibold">{SETTINGS.campaign.performerSeatsLeft}</span>
+                  </div>
+                  <div className="flex flex-col items-end">
+                    <a
+                      href={SETTINGS.ctaLinkPerformer}
+                      className="rounded-2xl px-6 py-2 font-bold transition duration-200 transform hover:-translate-y-0.5 active:translate-y-0 hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FFD700] focus:ring-offset-black"
+                      style={{ background: COLORS.neonGold, color: "#0a0a0a", boxShadow: "0 0 22px rgba(255,215,0,0.6)" }}
+                    >
+                      🔥 Získat nabídku PERFORMER
+                    </a>
+                    <div className="mt-1 text-xs" style={{ color: COLORS.red, opacity: 0.9 }}>
+                      Dokud jsou místa.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </GlowCard>
+        </div>
+
+        {/* TEAM / ABOUT */}
+        <div className="max-w-6xl mx-auto px-6 pb-10">
+          <h2
+            className="text-2xl md:text-4xl font-extrabold text-center uppercase text-transparent bg-clip-text tracking-tight"
+            style={{ backgroundImage: "linear-gradient(90deg,#FFFFFF,#FFD700)" }}
+          >
+            Kdo za tím stojí?
+          </h2>
+          <div className="mt-3 max-w-3xl mx-auto text-center text-white/90 text-base md:text-lg leading-relaxed">
+            DJs hrající na největších stage v ČR: <strong>Colours of Ostrava</strong>, <strong>Beats 4 Love</strong>, klubové noci, velké eventy, soukromé eventy.
+            <br />
+            <span className="inline-block mt-2">Neučíme teorii. Předáváme reálné zkušenosti ze stage.</span>
+          </div>
+          <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div
+                key={`mentor-${i}`}
+                className="aspect-[5/3] rounded-xl bg-white/5 flex items-center justify-center text-white/70 text-sm"
+                style={{ boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.08)" }}
+              >
+                Foto / jméno mentora {i + 1}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* REVIEWS */}
+        <div className="max-w-6xl mx-auto px-6 pb-10">
+          <h2
+            className="text-2xl md:text-4xl font-extrabold text-center uppercase text-transparent bg-clip-text tracking-tight"
+            style={{ backgroundImage: "linear-gradient(90deg,#FFFFFF,#FFD700)" }}
+          >
+            Co si o TR komunitě myslí lidé, kteří u nás hráli.
+          </h2>
+          <div className="mt-6 grid md:grid-cols-3 gap-4">
+            {[1, 2, 3].map((i) => (
+              <div
+                key={`review-${i}`}
+                className="rounded-2xl p-5 text-white"
+                style={{
+                  background: "rgba(18,18,18,0.6)",
+                  backdropFilter: "blur(8px)",
+                  boxShadow:
+                    "inset 0 0 0 1px rgba(255,255,255,0.08), 0 0 14px rgba(255,255,255,0.06)",
+                }}
+              >
+                <div className="text-sm">⭐️⭐️⭐️⭐️⭐️</div>
+                <p className="mt-2 text-white/90 text-sm">
+                  „Skvělé prostředí, real feedback a první booking mimo klub díky TR. Doporučuju.“
+                </p>
+                <div className="mt-3 text-xs text-white/70">— Člen komunity</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* PARTNEŘI */}
+        <div className="max-w-6xl mx-auto px-6 pb-12">
+          <h2
+            className="text-2xl md:text-3xl font-extrabold text-center uppercase text-transparent bg-clip-text tracking-tight"
+            style={{ backgroundImage: "linear-gradient(90deg,#FFFFFF,#FFD700)" }}
+          >
+            Partneři
+          </h2>
+          <LogosScroller />
+        </div>
+
+        {/* FAQ */}
+        <div className="max-w-6xl mx-auto px-6 pb-12">
+          <h2
+            className="text-2xl md:text-4xl font-extrabold text-center uppercase text-transparent bg-clip-text tracking-tight"
+            style={{ backgroundImage: "linear-gradient(90deg,#FFFFFF,#FFD700)" }}
+          >
+            Často kladené otázky
+          </h2>
+          <div className="mt-6 space-y-3">
+            {[
+              {
+                q: "Jak zruším členství?",
+                a: "Po úvodních 3 měsících přecházíš na měsíční platbu, kterou můžeš kdykoliv ukončit – bez skrytých poplatků.",
+              },
+              {
+                q: "Co když nemám zkušenost s CDJ‑3000?",
+                a: "Pomůžeme s nastavením a workflow. Máme krátký onboarding a doporučené sety na rozjezd.",
+              },
+              { q: "Je cena s DPH?", a: "Ano, všechny částky uvádíme včetně DPH." },
+              {
+                q: "Co přesně je v New Music Packu?",
+                a: "Každý měsíc kurátorované bangery, remixy, edity a mashupy z placených zdrojů.",
+              },
+              {
+                q: "Jak funguje 14denní garance?",
+                a: "Když během 14 dní zjistíš, že to není pro tebe, napiš nám a platbu vrátíme.",
+              },
+            ].map((item, idx) => (
+              <details
+                key={`faq-${idx}`}
+                className="rounded-xl p-4 bg-white/5 text-white"
+                style={{ boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.08)" }}
+              >
+                <summary className="cursor-pointer font-semibold">{item.q}</summary>
+                <p className="mt-2 text-white/90">{item.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+
+        {/* Final CTA */}
+        <div className="border-t" style={{ borderColor: "#1a1a1a" }}>
+          <div className="max-w-6xl mx-auto px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div>
+              <div className="text-lg md:text-xl font-extrabold text-white">
+                Připraven posunout svůj DJ level?
+              </div>
+              <div className="text-white">
+                Vyber si balíček a rezervuj si místo, než se kapacita naplní.
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <a
+                href={SETTINGS.ctaLinkStarter}
+                className="rounded-2xl px-6 py-2 font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#39FF14] focus:ring-offset-black"
+                style={{ background: COLORS.neonGreen, color: "#0a0a0a", boxShadow: "0 0 18px rgba(57,255,20,0.5)" }}
+              >
+                Získat nabídku BASIC
+              </a>
+              <a
+                href={SETTINGS.ctaLinkPerformer}
+                className="rounded-2xl px-6 py-2 font-bold focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FFD700] focus:ring-offset-black"
+                style={{ background: COLORS.neonGold, color: "#0a0a0a", boxShadow: "0 0 22px rgba(255,215,0,0.6)" }}
+              >
+                Získat nabídku PERFORMER
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Return inner component (keeps module names unique)
+  return TR_AppInner;
+})();
+
+export default TR_App;
