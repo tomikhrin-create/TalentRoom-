@@ -1,852 +1,1373 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Talent Room — komunita pro DJs</title>
+  <meta name="description" content="Talent Room je komunita pro DJs, kteří chtějí být vidět, růst a posunout se dál." />
 
-/**
- * TALENT ROOM — CRO Landing (Czech)
- * Full rewrite to sandbox all names and stop duplicate-var collisions like
- * "Can't create duplicate variable: '_0x2bcb81'".
- *
- * How it avoids collisions:
- * - Everything (constants, helpers, components) lives inside an IIFE closure
- *   that returns the App component; at top-level we only have the import and
- *   a single `export default (...)` expression. No global `var/let/const`.
- * - No global <style> tags or CSS keyframes that some bundlers obfuscate.
- * - JSX strictly paired/closed; no stray tags.
- * - Small runtime "tests" via console.assert after mount to sanity-check DOM.
- */
+  <!-- Font: Montserrat -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-const TR_App = (() => {
-  // ---------------- Settings & Colors (scoped in closure) ----------------
-  const COLORS = {
-    bg: "#000000",
-    neonGold: "#FFD700",
-    neonGreen: "#39FF14",
-    red: "#dc2626",
-  };
+  <style>
+    :root{
+      --bg:#0b0c10;
+      --bg2:#07080b;
+      --text:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.68);
+      --line:rgba(255,255,255,.10);
 
-  const SETTINGS = {
-    campaign: {
-      headline:
-        "Talent Room: trénuj a vystupuj. Nonstop studio, 4 decky, nahrávání + komunita.",
-      sub: "Jen pro 20 členů!",
-      deadlineISO: "2025-09-30T23:59:59",
-      totalSeats: 20,
-      starterSeatsLeft: 10,
-      performerSeatsLeft: 8,
-    },
-    ctaLinkStarter: "#pricing-starter",
-    ctaLinkPerformer: "#pricing-performer",
-    assets: {
-      logo: null,
-      heroVideo: null,
-      heroPoster: null,
-      heroBg: null,
-      studio: null,
-      camera: null,
-      decks: null,
-    },
-  };
+      /* BRAND GOLD */
+      --accent:#E49510;          /* hlavní zlatá */
+      --accentDeep:#D87500;      /* klik / aktivní */
 
-  // ---------------- Helpers ----------------
-  function useCountdown(targetISO) {
-    const target = useMemo(() => new Date(targetISO).getTime(), [targetISO]);
-    const [timeLeft, setTimeLeft] = useState(() => Math.max(0, target - Date.now()));
-    useEffect(() => {
-      const id = setInterval(() => setTimeLeft(Math.max(0, target - Date.now())), 1000);
-      return () => clearInterval(id);
-    }, [target]);
-    const s = Math.floor(timeLeft / 1000);
-    const d = Math.floor(s / 86400);
-    const h = Math.floor((s % 86400) / 3600);
-    const m = Math.floor((s % 3600) / 60);
-    const sec = s % 60;
-    return { d, h, m, sec, finished: s <= 0 };
-  }
-
-  function ImageSlot({ src, label }) {
-    return (
-      <div
-        className="aspect-[16/9] w-full rounded-xl overflow-hidden bg-white/5 flex items-center justify-center text-white/70"
-        style={{ boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.08)" }}
-      >
-        {src ? (
-          <img
-            src={src}
-            alt={label}
-            loading="lazy"
-            decoding="async"
-            width={1600}
-            height={900}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <span className="text-sm">{label} – sem přijde fotka</span>
-        )}
-      </div>
-    );
-  }
-
-  // ---------------- JS-driven marquee (no CSS @keyframes) ----------------
-  const CAROUSEL_ITEMS = [
-    "🛡️ 30 dní. Buď to miluješ, nebo vracíme cash.",
-    "🎧 Skool platforma: tvoje nonstop DJ komunita 24/7.",
-    "🔥 New Music Drops každý týden.",
-    "🎹 Producers Packs: hot zvuky, co ti zvednou level.",
-    "⚡ Tipy & triky, co ti zkrátí roky učení na týdny.",
-    "🤝 Networking: poznej DJs, se kterými můžeš růst.",
-    "📅 Rezervační systém: studio ready, kdy chceš ty.",
-    "🏆 Contesty o festivaly a real vystoupení.",
-  ];
-
-  function Marquee({ items = CAROUSEL_ITEMS }) {
-    const wrapRef = useRef(null);
-    const innerRef = useRef(null);
-
-    useEffect(() => {
-      const wrap = wrapRef.current;
-      const inner = innerRef.current;
-      if (!wrap || !inner) return;
-
-      let rafId = 0;
-      let x = 0;
-      const step = () => {
-        x -= 1.4; // faster scroll (px per frame, was 0.5)
-        if (inner.scrollWidth > 0) {
-          if (-x >= inner.scrollWidth / 2) x = 0;
-        }
-        inner.style.transform = `translateX(${x}px)`;
-        rafId = requestAnimationFrame(step);
-      };
-      rafId = requestAnimationFrame(step);
-      return () => cancelAnimationFrame(rafId);
-    }, [items]);
-
-    const text = items.join("   •   ");
-    return (
-      <div
-        className="mt-7 w-full max-w-4xl mx-auto rounded-2xl border px-0 py-0 overflow-hidden"
-        style={{
-          borderColor: COLORS.neonGold,
-          boxShadow: "0 0 22px rgba(255,215,0,0.35)",
-          background: "#0b0b0b",
-        }}
-        role="region"
-        aria-label="informativní karusel"
-      >
-        <div className="relative h-9 md:h-10 overflow-hidden" ref={wrapRef}>
-          <div
-            className="pointer-events-none absolute inset-y-0 left-0 w-10"
-            style={{ background: "linear-gradient(90deg, #0b0b0b, rgba(11,11,11,0))" }}
-          />
-          <div
-            className="pointer-events-none absolute inset-y-0 right-0 w-10"
-            style={{ background: "linear-gradient(270deg, #0b0b0b, rgba(11,11,11,0))" }}
-          />
-          <div
-            ref={innerRef}
-            className="whitespace-nowrap font-semibold text-white text-sm md:text-base leading-9 md:leading-10 will-change-transform"
-            style={{ display: "inline-block", paddingLeft: "100%" }}
-            aria-live="off"
-          >
-            <span className="inline-block pr-12">{text}</span>
-            <span className="inline-block pr-12">{text}</span>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // ---------------- Partners scroller (JS) ----------------
-  function LogosScroller() {
-    const wrapRef = useRef(null);
-    const innerRef = useRef(null);
-
-    useEffect(() => {
-      const wrap = wrapRef.current;
-      const inner = innerRef.current;
-      if (!wrap || !inner) return;
-      let rafId = 0;
-      let x = 0;
-      const step = () => {
-        x -= 1.2;
-        if (inner.scrollWidth > 0) {
-          if (-x >= inner.scrollWidth / 2) x = 0;
-        }
-        inner.style.transform = `translateX(${x}px)`;
-        rafId = requestAnimationFrame(step);
-      };
-      rafId = requestAnimationFrame(step);
-      return () => cancelAnimationFrame(rafId);
-    }, []);
-
-    const logos = Array.from({ length: 8 }).map((_, idx) => (
-      <span
-        key={`logo-${idx}`}
-        className="inline-flex items-center justify-center mx-8 w-28 h-12 bg-white/5 rounded-md text-white/70 text-xs"
-      >
-        Logo {idx + 1}
-      </span>
-    ));
-
-    return (
-      <div className="mt-4 relative overflow-hidden rounded-2xl border" style={{ borderColor: "#ffffff22" }}>
-        <div ref={wrapRef} className="overflow-hidden">
-          <div ref={innerRef} className="whitespace-nowrap py-4 will-change-transform">
-            {logos}
-            {logos}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // ---------------- Glow utilities (interactive neon glow following cursor) ----------------
-  function hexToRgbA(hex, alpha = 0.6) {
-    if (!hex) return `rgba(255,255,255,${alpha})`;
-    const h = (hex || "").replace("#", "");
-    const bigint = parseInt(h, 16);
-    const r = (bigint >> 16) & 255;
-    const g = (bigint >> 8) & 255;
-    const b = bigint & 255;
-    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+      --shadow:0 18px 60px rgba(0,0,0,.55);
+      --radius:22px;
+      --max:1120px;
     }
 
-  function GlowCard({ color = COLORS.neonGold, children }) {
-    const ref = useRef(null);
-    const [glow, setGlow] = useState({ x: 0, y: 0, show: false });
+    *{ box-sizing:border-box; }
 
-    const onMove = (e) => {
-      const el = ref.current;
-      if (!el) return;
-      const rect = el.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      setGlow({ x, y, show: true });
-    };
-    const onLeave = () => setGlow((g) => ({ ...g, show: false }));
+    html,body{
+      margin:0;
+      font-family:"Montserrat", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background:
+        radial-gradient(1100px 600px at 18% -10%, rgba(228,149,16,.18), transparent 60%),
+        radial-gradient(900px 500px at 92% 0%, rgba(228,149,16,.12), transparent 55%),
+        radial-gradient(900px 700px at 40% 120%, rgba(255,255,255,.05), transparent 60%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      color:var(--text);
+      overflow-x:hidden;
+    }
 
-    const glowBg = `radial-gradient(200px 200px at ${glow.x}px ${glow.y}px, ${hexToRgbA(
-      color,
-      0.35
-    )}, transparent 60%)`;
+    a{ color:inherit; text-decoration:none; }
 
-    return (
-      <div
-        ref={ref}
-        onMouseMove={onMove}
-        onMouseEnter={() => setGlow((g) => ({ ...g, show: true }))}
-        onMouseLeave={onLeave}
-        className="relative rounded-2xl"
-        style={{
-          boxShadow: glow.show
-            ? `0 0 28px ${hexToRgbA(color, 0.55)}`
-            : "0 0 14px rgba(255,255,255,0.06)",
-          transition: "box-shadow 160ms ease",
-        }}
-      >
-        {/* dynamic glow layer */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 rounded-2xl"
-          style={{
-            background: glow.show ? glowBg : "transparent",
-            mixBlendMode: "screen",
-            transition: "background 120ms ease",
-          }}
-        />
-        {/* content */}
-        <div className="relative rounded-2xl overflow-hidden">{children}</div>
+    /* subtle noise overlay */
+    .noise::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.22'/%3E%3C/svg%3E");
+      opacity:.05;
+      mix-blend-mode:overlay;
+    }
+
+    .page{ width:100%; }
+
+    .container{
+      max-width:var(--max);
+      margin:0 auto;
+      padding:0 18px;
+    }
+
+    .layerInner{
+      position:relative;
+      z-index:2;
+      width:min(var(--max), calc(100% - 36px));
+      margin:0 auto;
+    }
+
+    /* Header */
+    header{
+      position:sticky;
+      top:0;
+      z-index:30;
+      backdrop-filter:blur(14px);
+      -webkit-backdrop-filter:blur(14px);
+      background:var(--accent); /* jednotná barva */
+      border-bottom:1px solid rgba(0,0,0,.10);
+    }
+
+    .headerInner{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:12px 0;
+      gap:14px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-weight:900;
+      letter-spacing:.12em;
+      white-space:nowrap;
+      text-transform:uppercase;
+      color:rgba(0,0,0,.92);
+    }
+
+    /* logo placeholder (můžeš vyměnit SVG/PNG) */
+    .logo{
+      width:38px;
+      height:38px;
+      border-radius:14px;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255,255,255,.55), transparent 60%),
+        linear-gradient(135deg, rgba(255,255,255,.22), rgba(0,0,0,.10)),
+        linear-gradient(135deg, rgba(228,149,16,1), rgba(255,255,255,.22));
+      box-shadow:0 14px 35px rgba(0,0,0,.18);
+      border:1px solid rgba(0,0,0,.14);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .logo::after{
+      content:"TR";
+      position:absolute;
+      inset:0;
+      display:grid;
+      place-items:center;
+      font-weight:900;
+      letter-spacing:.08em;
+      color:rgba(0,0,0,.72);
+      font-size:13px;
+    }
+
+    nav{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      color:rgba(0,0,0,.74);
+      font-size:14px;
+      font-weight:800;
+    }
+
+    nav a{
+      padding:10px 10px;
+      border-radius:12px;
+      transition:background .2s ease, color .2s ease;
+    }
+
+    nav a:hover{
+      background:rgba(0,0,0,.06);
+      color:rgba(0,0,0,.92);
+    }
+
+    .ctaTop{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 14px;
+      border-radius:14px;
+      border:1px solid rgba(0,0,0,.14);
+      background:rgba(255,255,255,.35);
+      transition:transform .2s ease, background .2s ease, border-color .2s ease;
+      box-shadow:0 10px 40px rgba(0,0,0,.16);
+      white-space:nowrap;
+      color:rgba(0,0,0,.90);
+      font-weight:900;
+    }
+
+    .ctaTop:hover{
+      transform:translateY(-1px);
+      background:rgba(255,255,255,.50);
+      border-color:rgba(0,0,0,.20);
+    }
+
+    /* Buttons */
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding:14px 18px;
+      border-radius:16px;
+      font-weight:800;
+      letter-spacing:.2px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      transition:transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+      cursor:pointer;
+      user-select:none;
+      box-shadow:0 10px 40px rgba(0,0,0,.30);
+      white-space:nowrap;
+    }
+
+    .btn:hover{ transform:translateY(-1px); }
+
+    .btn:active{ transform:translateY(0); }
+
+    .btnPrimary{
+      border-color:rgba(228,149,16,.55);
+      background:var(--accent); /* jednotná barva */
+      color:rgba(0,0,0,.92);
+      box-shadow:0 16px 55px rgba(228,149,16,.18);
+    }
+
+    /* pouze změna barvy při kliknutí */
+    .btnPrimary:active{
+      background:var(--accentDeep);
+      border-color:rgba(216,117,0,.75);
+      box-shadow:0 16px 55px rgba(216,117,0,.22);
+    }
+
+    .btnSmall{
+      padding:12px 14px;
+      border-radius:14px;
+      font-size:14px;
+    }
+
+    /* Sections */
+    .layer{
+      position:relative;
+      width:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      overflow:hidden;
+      padding:86px 0 64px;
+    }
+
+    .layer::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        linear-gradient(180deg, rgba(11,12,16,.20), rgba(11,12,16,.92)),
+        radial-gradient(1000px 520px at 50% 10%, rgba(228,149,16,.16), transparent 60%);
+      z-index:0;
+    }
+
+    .layerAlt::before{
+      background:
+        radial-gradient(1100px 620px at 20% 0%, rgba(255,255,255,.05), transparent 60%),
+        radial-gradient(1000px 520px at 85% 15%, rgba(228,149,16,.10), transparent 62%),
+        linear-gradient(180deg, rgba(11,12,16,.92), rgba(11,12,16,.98));
+    }
+
+    /* HERO background image layer (full width) */
+    .hasBg::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        linear-gradient(180deg, rgba(11,12,16,.18), rgba(11,12,16,.92)),
+        radial-gradient(900px 520px at 50% 0%, rgba(228,149,16,.18), transparent 62%),
+        var(--bg-img);
+      background-size:cover;
+      background-position:center;
+      transform:translateZ(0);
+      z-index:0;
+    }
+
+    .heroLayer{
+      min-height:86vh;
+      padding:86px 0 60px;
+    }
+
+    .heroH1{
+      margin:0 auto 12px;
+      max-width:28ch;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:-0.035em;
+      line-height:1.08;
+      font-size:clamp(30px, 4.2vw, 50px);
+      color:rgba(255,255,255,.96);
+      text-shadow:0 18px 60px rgba(0,0,0,.55);
+    }
+
+    .heroH2{
+      margin:0 auto;
+      max-width:92ch;
+      color:rgba(255,255,255,.80);
+      font-size:clamp(14px, 1.25vw, 16px);
+      line-height:1.55;
+    }
+
+    @media (min-width: 980px){
+      .heroH2{ white-space:nowrap; }
+    }
+
+    /* Titles */
+    .sectionTitle{
+      margin:0 auto 10px;
+      font-size:clamp(26px, 3vw, 38px);
+      font-weight:900;
+      letter-spacing:-0.03em;
+    }
+
+    .sectionText{
+      margin:0 auto;
+      max-width:84ch;
+      color:rgba(255,255,255,.70);
+      line-height:1.75;
+      font-size:16px;
+    }
+
+    /* LIGHT SECTION (white background / black text) */
+    .layerLight{ color:#0b0c10; }
+
+    .layerLight::before{
+      background:
+        radial-gradient(1100px 640px at 20% 0%, rgba(228,149,16,.08), transparent 62%),
+        radial-gradient(900px 520px at 90% 10%, rgba(0,0,0,.04), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,1), rgba(255,255,255,1));
+    }
+
+    .layerLight .sectionTitle{ color:rgba(0,0,0,.92); }
+    .layerLight .sectionText{ color:rgba(0,0,0,.62); }
+    .layerLight .productTitle{ color:rgba(0,0,0,.90); }
+
+    .layerLight .btn{
+      border-color:rgba(0,0,0,.12);
+      background:rgba(0,0,0,.04);
+      color:rgba(0,0,0,.88);
+      box-shadow:0 10px 40px rgba(0,0,0,.12);
+    }
+
+    .layerLight .btn:hover{ background:rgba(0,0,0,.05); }
+
+    .layerLight .btnPrimary{
+      background:var(--accent);
+      border-color:rgba(228,149,16,.65);
+      color:rgba(0,0,0,.92);
+      box-shadow:0 14px 50px rgba(228,149,16,.18);
+    }
+
+    .layerLight .btnPrimary:active{ background:var(--accentDeep); }
+
+    /* PRODUCTS */
+    .products{
+      margin-top:26px;
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0, 1fr));
+      gap:44px; /* větší mezery mezi produkty */
+      align-items:stretch;
+    }
+
+    .product{
+      text-align:center;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+
+    .productTitle{
+      margin:0;
+      font-size:14px;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.14em;
+    }
+
+    .productMedia{ display:flex; justify-content:center; }
+
+    .productImageBtn{
+      width:100%;
+      border:0;
+      background:transparent;
+      padding:0;
+      cursor:pointer;
+      outline:none;
+    }
+
+    @property --glowAngle {
+      syntax: "<angle>";
+      inherits: false;
+      initial-value: 0deg;
+    }
+
+    .productImage{
+      --glowActive: 0;
+      width:100%;
+      aspect-ratio: 4 / 3;
+      border-radius:22px;
+      border:1px solid rgba(0,0,0,.10);
+      background:
+        linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,.02)),
+        radial-gradient(720px 380px at 18% 10%, rgba(228,149,16,.14), transparent 62%),
+        radial-gradient(720px 380px at 88% 0%, rgba(228,149,16,.10), transparent 60%),
+        var(--img);
+      background-size:cover;
+      background-position:center;
+      box-shadow:0 18px 60px rgba(0,0,0,.10);
+      position:relative;
+      overflow:hidden;
+      transform:translateY(0);
+      transition:transform .2s ease, border-color .2s ease;
+    }
+
+    .productImage::after{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      border-radius:inherit;
+      pointer-events:none;
+      opacity:calc(var(--glowActive) * .95);
+      transition:opacity .18s ease;
+      border:2px solid transparent;
+      background:
+        linear-gradient(transparent, transparent) padding-box,
+        conic-gradient(
+          from var(--glowAngle),
+          rgba(228,149,16,0) 0deg,
+          rgba(228,149,16,.90) 65deg,
+          rgba(228,149,16,.60) 140deg,
+          rgba(216,117,0,.55) 220deg,
+          rgba(228,149,16,.68) 290deg,
+          rgba(228,149,16,0) 360deg
+        ) border-box;
+      filter:blur(.12px);
+    }
+
+    .productImageBtn:hover .productImage{
+      transform:translateY(-2px);
+      border-color:rgba(228,149,16,.24);
+    }
+
+    .productCtaUnder{
+      margin-top:14px;
+      display:flex;
+      justify-content:center;
+    }
+
+    /* ========== MEZI-LAYER: PARTNEŘI (více bílé) ========== */
+    .partnersLayer{
+      padding:30px 0; /* trochu větší -> plynulejší přechod */
+      text-align:center;
+    }
+
+    .partnersLayer::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(900px 240px at 50% 42%, rgba(228,149,16,.08), transparent 72%),
+        linear-gradient(180deg, rgba(255,255,255,1), rgba(255,255,255,1));
+      z-index:0;
+    }
+
+    .partnersBar{
+      position:relative;
+      z-index:2;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:14px;
+    }
+
+    /* Carousel / marquee (clean: only logos, no frames) */
+    .partnersMarquee{
+      width:100%;
+      overflow:hidden;
+      border:none;
+      background:transparent;
+      box-shadow:none;
+      padding:0;
+    }
+
+    .partnersTrack{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      width:max-content;
+      animation:partnerScroll 22s linear infinite;
+      will-change:transform;
+    }
+
+    .partnersLayer:hover .partnersTrack{ animation-play-state:paused; }
+
+    @keyframes partnerScroll{
+      from{ transform:translateX(0); }
+      to{ transform:translateX(-50%); }
+    }
+
+    /* removed partners label (carouseled only) */
+
+    .partnersRow{
+      display:flex;
+      align-items:center;
+      justify-content:flex-start;
+      gap:14px;
+      flex-wrap:nowrap;
+    }
+
+    .partnerLogo{
+      height:30px;
+      width:auto;
+      opacity:.92;
+      border:none;
+      background:transparent;
+      box-shadow:none;
+      border-radius:0;
+      filter:grayscale(0);
+      transition:opacity .18s ease, transform .18s ease;
+    }
+
+    .partnerLogo:hover{
+      opacity:1;
+      transform:translateY(-1px);
+    }
+
+    /* ========== SEKCE 3: MISE ========== */
+    #mise.layerAlt::before{
+      background:
+        radial-gradient(1200px 680px at 18% 0%, rgba(228,149,16,.14), transparent 62%),
+        radial-gradient(980px 520px at 88% 10%, rgba(228,149,16,.10), transparent 60%),
+        radial-gradient(900px 520px at 50% 120%, rgba(255,255,255,.05), transparent 62%),
+        linear-gradient(180deg, rgba(11,12,16,.92), rgba(11,12,16,.985));
+    }
+
+    #mise .sectionTitle{
+      font-size:clamp(28px, 3.2vw, 38px);
+      font-weight:900;
+      letter-spacing:-0.03em;
+      margin-bottom: 12px;
+    }
+
+    #mise .sectionText{
+      font-size:18px;
+      max-width:92ch;
+      color:rgba(255,255,255,.72);
+    }
+
+    .missionIntro{
+      margin-top:18px;
+      max-width:94ch;
+      margin-left:auto;
+      margin-right:auto;
+    }
+
+    .missionIntro p{
+      margin:0;
+      color:rgba(255,255,255,.82);
+      line-height:1.95;
+      font-size:19px;
+      text-align:center;
+    }
+
+    .missionRows{
+      margin-top:36px;
+      display:flex;
+      flex-direction:column;
+      gap:26px;
+      max-width:1120px;
+      margin-left:auto;
+      margin-right:auto;
+      text-align:left;
+    }
+
+    .missionRow{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-areas: "text media";
+      gap:0;
+      align-items:stretch;
+    }
+
+    .missionRow.swap{ grid-template-areas: "media text"; }
+
+    .missionRow .missionCard{ grid-area:text; }
+    .missionRow .missionMedia{ grid-area:media; }
+
+    .missionCard{
+      padding:28px 28px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.10);
+      border-right:0;
+      border-radius:22px 0 0 22px;
+      box-shadow:0 18px 70px rgba(0,0,0,.38);
+    }
+
+    .missionCard h3{
+      margin:0 0 10px;
+      font-size:18px;
+      font-weight:900;
+      letter-spacing:-0.02em;
+    }
+
+    .missionCard p{
+      margin:0 0 10px;
+      color:rgba(255,255,255,.78);
+      line-height:1.75;
+      font-size:16px;
+    }
+
+    .missionCard ul{
+      margin:10px 0 10px;
+      padding-left:18px;
+      color:rgba(255,255,255,.74);
+      line-height:1.7;
+      font-size:16px;
+    }
+
+    .missionRow .missionMedia{
+      min-height:340px;
+      position:relative;
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:0 22px 22px 0;
+      background:
+        linear-gradient(180deg, rgba(11,12,16,.14), rgba(11,12,16,.90)),
+        radial-gradient(700px 340px at 18% 10%, rgba(228,149,16,.16), transparent 60%),
+        radial-gradient(700px 340px at 88% 0%, rgba(228,149,16,.12), transparent 60%),
+        var(--img);
+      background-size:cover;
+      background-position:center;
+      transform:translateZ(0);
+      box-shadow:0 18px 70px rgba(0,0,0,.38);
+      overflow:hidden;
+    }
+
+    .missionRow.swap .missionCard{
+      border-radius:0 22px 22px 0;
+      border-right:1px solid rgba(255,255,255,.10);
+      border-left:0;
+    }
+
+    .missionRow.swap .missionMedia{ border-radius:22px 0 0 22px; }
+
+    .missionMediaLabel{
+      position:absolute;
+      left:14px;
+      bottom:14px;
+      z-index:2;
+      padding:10px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(0,0,0,.38);
+      color:rgba(255,255,255,.85);
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.02em;
+      backdrop-filter:blur(12px);
+      -webkit-backdrop-filter:blur(12px);
+    }
+
+    /* FAQ */
+    .faqWrap{
+      margin-top:18px;
+      max-width:920px;
+      margin-left:auto;
+      margin-right:auto;
+      text-align:left;
+    }
+
+    details.faqItem{
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.04);
+      border-radius:18px;
+      padding:14px 16px;
+      box-shadow:0 18px 60px rgba(0,0,0,.30);
+      margin-bottom:12px;
+    }
+
+    details.faqItem[open]{
+      border-color:rgba(255,255,255,.16);
+      background:rgba(255,255,255,.05);
+    }
+
+    details.faqItem summary{
+      cursor:pointer;
+      list-style:none;
+      font-weight:900;
+      letter-spacing:-0.01em;
+      color:rgba(255,255,255,.88);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    details.faqItem summary::-webkit-details-marker{ display:none; }
+
+    .faqIcon{
+      width:34px;
+      height:34px;
+      border-radius:12px;
+      display:grid;
+      place-items:center;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(0,0,0,.18);
+      color:rgba(255,255,255,.65);
+      flex:0 0 auto;
+      transition:transform .2s ease;
+    }
+
+    details.faqItem[open] .faqIcon{ transform:rotate(45deg); }
+
+    .faqBody{
+      margin-top:10px;
+      color:rgba(255,255,255,.70);
+      line-height:1.7;
+      font-size:14px;
+    }
+
+    /* Reveal */
+    .reveal{ opacity:0; transform:translateY(10px); transition:opacity .55s ease, transform .55s ease; }
+    .reveal.is-in{ opacity:1; transform:translateY(0); }
+
+    :focus-visible{ outline:2px solid rgba(228,149,16,.55); outline-offset:3px; border-radius:14px; }
+
+    /* MODAL */
+    .modal{
+      position:fixed;
+      inset:0;
+      z-index:80;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      background:rgba(0,0,0,.55);
+      backdrop-filter:blur(12px);
+      -webkit-backdrop-filter:blur(12px);
+    }
+
+    .modal.isOpen{ display:flex; }
+
+    .modalPanel{
+      width:min(920px, 92vw);
+      max-height:min(82vh, 820px);
+      overflow:auto;
+      border-radius:22px;
+      border:1px solid rgba(255,255,255,.12);
+      background:
+        radial-gradient(900px 520px at 20% 0%, rgba(255,255,255,.05), transparent 60%),
+        radial-gradient(900px 520px at 85% 10%, rgba(228,149,16,.14), transparent 62%),
+        linear-gradient(180deg, rgba(11,12,16,.96), rgba(11,12,16,.985));
+      box-shadow:0 28px 120px rgba(0,0,0,.65);
+      position:relative;
+      padding:18px 18px 16px;
+    }
+
+    .modalTop{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      padding:6px 2px 12px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      margin-bottom:14px;
+    }
+
+    .modalTitle{
+      margin:0;
+      font-size:16px;
+      font-weight:900;
+      letter-spacing:-0.01em;
+      text-transform:uppercase;
+    }
+
+    .modalPrice{
+      margin-top:6px;
+      color:rgba(255,255,255,.70);
+      font-size:14px;
+    }
+
+    .modalActions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex:0 0 auto;
+    }
+
+    .modalClose{
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.06);
+      color:rgba(255,255,255,.85);
+      border-radius:14px;
+      width:42px;
+      height:42px;
+      display:grid;
+      place-items:center;
+      cursor:pointer;
+      transition:transform .2s ease;
+      flex:0 0 auto;
+    }
+
+    .modalClose:hover{ transform:translateY(-1px); }
+    .modalClose:active{ transform:translateY(0); }
+
+    .modalBody{
+      text-align:left;
+      line-height:1.65;
+      color:rgba(255,255,255,.86);
+      padding:2px 2px 12px;
+    }
+
+    .modalBody h4{
+      margin:16px 0 6px;
+      font-size:14px;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+      color:rgba(255,255,255,.76);
+    }
+
+    .modalBody p{
+      margin:0 0 10px;
+      color:rgba(255,255,255,.72);
+      font-size:14px;
+    }
+
+    .modalBody ul{
+      margin:8px 0 10px;
+      padding-left:18px;
+      color:rgba(255,255,255,.72);
+      font-size:14px;
+    }
+
+    .modalFooter{
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+      border-top:1px solid rgba(255,255,255,.08);
+      padding-top:14px;
+      margin-top:6px;
+    }
+
+    @media (max-width: 920px){
+      nav{ display:none; }
+      .layer{ padding:70px 0 54px; }
+      .heroLayer{ padding:92px 0 72px; min-height:84vh; }
+      .products{ grid-template-columns:1fr; }
+
+      .partnersLayer{ padding:26px 0; }
+      .partnerLogo{ height:28px; }
+      .partnersLabel{ width:100%; justify-content:center; }
+
+      .missionRow{ grid-template-columns:1fr; grid-template-areas:"text" "media"; }
+      .missionRow.swap{ grid-template-areas:"text" "media"; }
+      .missionMedia{ min-height:220px; }
+      #mise .sectionTitle{ font-size:26px; }
+      .missionCard{ padding:22px; border-right:1px solid rgba(255,255,255,.10); border-radius:22px 22px 0 0; }
+      .missionRow .missionMedia{ border-radius:0 0 22px 22px; }
+    }
+  </style>
+</head>
+
+<body class="noise">
+  <div class="page">
+
+    <header>
+      <div class="container headerInner">
+        <div class="brand">
+          <div class="logo" aria-hidden="true"></div>
+          <div>TALENT ROOM</div>
+        </div>
+
+        <nav aria-label="Hlavní navigace">
+          <a href="#top" title="Začátek">Start</a>
+          <a href="#modely" title="Komunita">Komunita</a>
+          <a href="#mise" title="Mise">Mise</a>
+          <a href="#faq" title="FAQ">FAQ</a>
+          <a href="#kontakt" title="Kontakt">Kontakt</a>
+        </nav>
+
+        <a class="ctaTop" href="#kontakt" aria-label="Bookni si hovor">
+          <span style="font-weight:900;">Bookni si hovor</span>
+          <span style="color:rgba(0,0,0,.55);font-size:13px;">→</span>
+        </a>
       </div>
-    );
-  }
+    </header>
 
-  // ---------------- App Component ----------------
-  function TR_AppInner() {
-    const { finished } = useCountdown(SETTINGS.campaign.deadlineISO);
-    const totalSeats = SETTINGS.campaign.totalSeats;
-    const seatsLeft =
-      SETTINGS.campaign.starterSeatsLeft + SETTINGS.campaign.performerSeatsLeft;
-    const percent = Math.min(
-      100,
-      Math.round(((totalSeats - seatsLeft) / totalSeats) * 100)
-    );
-
-    // Runtime sanity checks (simple "tests")
-    useEffect(() => {
-      // Defer asserts to next tick to ensure DOM painted
-      const id = requestAnimationFrame(() => {
-        console.assert(
-          document.querySelector("#pricing-starter"),
-          "Test: #pricing-starter existuje"
-        );
-        console.assert(
-          document.querySelector("#pricing-performer"),
-          "Test: #pricing-performer existuje"
-        );
-      });
-      return () => cancelAnimationFrame(id);
-    }, []);
-
-    return (
-      <section
-        className="w-full text-white text-[15.5px] md:text-[16.5px]"
-        style={{ background: "linear-gradient(180deg,#1a1a1a,#0e0e0e)" }}
-      >
-        {/* TOP HEADER */}
-        <header className="w-full border-b border-white/10">
-          <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              {SETTINGS.assets && SETTINGS.assets.logo ? (
-                <img src={SETTINGS.assets.logo} alt="Talent Room" className="h-7 w-auto" />
-              ) : (
-                <span className="text-white font-extrabold tracking-wide">
-                  TALENT ROOM
-                </span>
-              )}
-            </div>
-            <div
-              className="inline-flex items-center gap-2 text-xs sm:text-sm px-3 py-1.5 rounded-full border"
-              style={{
-                borderColor: "#ffffff33",
-                background: "rgba(255,255,255,0.06)",
-              }}
-            >
-              <span className="text-white/80">Přihlas se do</span>
-              <span className="font-semibold text-white">23:59</span>
-            </div>
-          </div>
-        </header>
-
-        {/* HERO */}
-        <div className="max-w-6xl mx-auto px-6 pt-16 pb-10 text-center">
-          <div
-            className="inline-flex items-center gap-2 rounded-full px-4 py-1 text-sm mb-5 border"
-            style={{
-              borderColor: `${COLORS.neonGold}40`,
-              background: "rgba(255,215,0,0.06)",
-              color: COLORS.neonGold,
-              boxShadow: "0 0 18px rgba(255,215,0,0.25)",
-            }}
-          >
-            <span>🔥</span> {SETTINGS.campaign.sub}
-          </div>
-          <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight leading-snug">
-            Staň se DJem, kterého lidi chtějí slyšet.
-          </h1>
-          <p className="mt-3 max-w-xl mx-auto text-sm md:text-base text-white/90 leading-relaxed">
-            Objev skutečný způsob, jak růst rychleji a stát se DJem, co má respekt.
-          </p>
-
-          {/* Video with blurred background */}
-          <div className="mt-6">
-            <div className="relative w-full max-w-4xl mx-auto rounded-2xl overflow-hidden">
-              {SETTINGS.assets && SETTINGS.assets.heroBg ? (
-                <img
-                  src={SETTINGS.assets.heroBg}
-                  alt=""
-                  aria-hidden
-                  className="absolute inset-0 w-full h-full object-cover"
-                  style={{ filter: "blur(16px)", transform: "scale(1.08)", opacity: 0.55 }}
-                />
-              ) : (
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    background:
-                      "radial-gradient(1200px 300px at 50% 0%, rgba(255,215,0,0.18), transparent 60%), radial-gradient(800px 300px at 50% 100%, rgba(57,255,20,0.12), transparent 60%), linear-gradient(180deg,#0b0b0b,#080808)",
-                  }}
-                />
-              )}
-              <div
-                className="pointer-events-none absolute inset-0"
-                style={{ boxShadow: "inset 0 0 120px rgba(0,0,0,0.65)" }}
-              />
-              <div className="relative">
-                {SETTINGS.assets && SETTINGS.assets.heroVideo ? (
-                  <video
-                    controls
-                    playsInline
-                    className="w-full aspect-video block"
-                    poster={(SETTINGS.assets && SETTINGS.assets.heroPoster) || undefined}
-                  >
-                    <source src={SETTINGS.assets.heroVideo} />
-                  </video>
-                ) : (
-                  <div className="w-full aspect-video flex items-center justify-center text-white/80">
-                    Nahraj promo video (hero) – nahoře nad garancí
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Social proof bubbles */}
-          <div className="mt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
-            <div
-              className="px-3 py-1.5 rounded-full border text-xs sm:text-sm font-semibold"
-              style={{ borderColor: `#ffffff55`, color: "#fff", boxShadow: "0 0 12px rgba(255,255,255,0.08)" }}
-            >
-              ⭐️ Hodnocení 5.0
-            </div>
-            <div
-              className="px-3 py-1.5 rounded-full border text-xs sm:text-sm font-semibold"
-              style={{ borderColor: `${COLORS.neonGreen}55`, color: COLORS.neonGreen, boxShadow: "0 0 12px rgba(57,255,20,0.25)" }}
-            >
-              👥 20+ lidí v aktivní komunitě
-            </div>
-            <div
-              className="px-3 py-1.5 rounded-full border text-xs sm:text-sm font-semibold"
-              style={{ borderColor: `${COLORS.neonGold}55`, color: COLORS.neonGold, boxShadow: "0 0 12px rgba(255,215,0,0.25)" }}
-            >
-              💸 80% levnější než kdy jindy
-            </div>
-          </div>
-
-          {/* Rotating info carousel banner */}
-          <Marquee />
-
-          {/* Seats progress */}
-          <div className="mt-7 max-w-xl mx-auto text-left">
-            <div className="flex items-center justify-between text-sm mb-2 text-white">
-              <span className="inline-flex items-center gap-2">
-                👥 Zbývá {seatsLeft} / {totalSeats} míst
-              </span>
-              <span>{percent}% obsazeno</span>
-            </div>
-            <div className="h-2 w-full rounded-full overflow-hidden bg-white/10">
-              <div
-                className="h-full"
-                style={{
-                  width: `${percent}%`,
-                  background: `linear-gradient(90deg, ${COLORS.neonGreen}, ${COLORS.neonGold})`,
-                  boxShadow: "0 0 14px rgba(255,215,0,0.35)",
-                }}
-              />
-            </div>
-          </div>
-
-          {/* CTA */}
-          <div className="mt-7 flex items-center justify-center gap-3">
-            <a
-              href={SETTINGS.ctaLinkStarter}
-              className="rounded-2xl px-6 py-3 font-semibold transition duration-200 transform hover:-translate-y-0.5 active:translate-y-0 hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#39FF14] focus:ring-offset-black"
-              style={{ background: COLORS.neonGreen, color: "#0a0a0a", boxShadow: "0 0 18px rgba(57,255,20,0.5)" }}
-            >
-              Získat nabídku BASIC
-            </a>
-            <a
-              href={SETTINGS.ctaLinkPerformer}
-              className="rounded-2xl px-6 py-3 font-bold transition duration-200 transform hover:-translate-y-0.5 active:translate-y-0 hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FFD700] focus:ring-offset-black"
-              style={{ background: COLORS.neonGold, color: "#0a0a0a", boxShadow: "0 0 22px rgba(255,215,0,0.6)" }}
-            >
-              Získat nabídku PERFORMER
-            </a>
-          </div>
-        </div>
-
-        {/* SECTION: Jak právě tobě… */}
-        <div className="max-w-6xl mx-auto px-6 pb-10">
-          <h2
-            className="text-2xl md:text-4xl font-extrabold text-center uppercase text-transparent bg-clip-text tracking-tight"
-            style={{ backgroundImage: "linear-gradient(90deg,#FFFFFF,#FFD700)" }}
-          >
-            Jak právě tobě můžeme pomoci?
-          </h2>
-          <p className="mt-3 max-w-3xl mx-auto text-base md:text-lg text-white/90 text-center leading-relaxed">
-            Náš závazek je dát ti nejlepší prostředí a příležitosti. S našimi
-            zkušenostmi a technikou jsi na správné cestě stát se úspěšným DJem.
-          </p>
-          <div className="mt-6 grid md:grid-cols-2 gap-6 items-stretch">
-            {/* Left: framed text */}
-            <div
-              className="rounded-2xl p-6 text-left"
-              style={{
-                background: "rgba(18,18,18,0.6)",
-                backdropFilter: "blur(8px)",
-                boxShadow:
-                  "inset 0 0 0 1px rgba(255,255,255,0.08), 0 0 14px rgba(255,255,255,0.06)",
-              }}
-            >
-              <div className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
-                Proč většina DJů neroste?
-              </div>
-              <p className="mt-3 text-white/90 text-base md:text-lg leading-relaxed">
-                Protože trénují doma. A doma se nikdo neposouvá.
-              </p>
-              <ul className="mt-5 space-y-2 text-white/90 text-base md:text-lg list-none leading-relaxed">
-                <li>⏱️ žádná disciplína</li>
-                <li>🗣️ žádný feedback</li>
-                <li>👥 žádná komunita</li>
-                <li>🏆 žádné contesty</li>
-                <li>🎤 žádné šance hrát venku</li>
-                <li>🕰️ roky stagnace</li>
-              </ul>
-              <div className="mt-6 text-lg md:text-xl font-semibold text-white">
-                Největší problém DJů není talent.
-                <br />
-                Je to prostředí.
-              </div>
-            </div>
-            {/* Right: photo */}
-            <div className="rounded-2xl overflow-hidden">
-              <ImageSlot src={SETTINGS.assets.studio} label="Tvoje nové prostředí – studio Talent Room" />
-            </div>
-          </div>
-        </div>
-
-        {/* GROW FASTER (left photos, right text) */}
-        <div className="max-w-6xl mx-auto px-6 pb-12">
-          <div className="grid md:grid-cols-2 gap-6 items-stretch">
-            {/* Left: photos */}
-            <div className="grid grid-cols-1 gap-4">
-              <ImageSlot src={SETTINGS.assets.studio} label="24/7 studio – hlavní místnost" />
-              <div className="grid grid-cols-2 gap-4">
-                <ImageSlot src={SETTINGS.assets.decks} label="CDJ setup – 4 decky" />
-                <ImageSlot src={SETTINGS.assets.camera} label="Nahrávání + kamera" />
-              </div>
-            </div>
-            {/* Right: text */}
-            <div
-              className="rounded-2xl p-6 text-left"
-              style={{
-                background: "rgba(18,18,18,0.6)",
-                backdropFilter: "blur(8px)",
-                boxShadow:
-                  "inset 0 0 0 1px rgba(255,255,255,0.08), 0 0 14px rgba(255,255,255,0.06)",
-              }}
-            >
-              <h3 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
-                Prostředí, kde rosteš rychleji!
-              </h3>
-              <ul className="mt-5 space-y-2 text-white/90 text-base md:text-lg leading-relaxed">
-                <li>🎛 <strong>24/7 studio ve Fabricu</strong></li>
-                <li>🧭 <strong>Mentoring od DJe</strong>, který hraje <em>Colours, B4L</em>, velké stage</li>
-                <li>👥 <strong>Komunita</strong> lidí, co jedou stejně jako ty</li>
-                <li>⚔️ <strong>Challenge</strong> každý měsíc</li>
-                <li>🔊 <strong>Feedback</strong>, který doma neuslyšíš</li>
-                <li>🏆 <strong>Contesty</strong> o reálné stage sloty</li>
-                <li>🎤 <strong>Cesta</strong> k reálným gigs</li>
-              </ul>
-              <div className="mt-6 text-lg md:text-xl font-semibold text-white">
-                Tady nejde o místnost.
-                <br />
-                Tady jde o tvoji DJ verzi 2.0.
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* PRICING / CHECKOUT */}
-        <div className="max-w-6xl mx-auto px-6 pb-6">
-          <h2
-            className="text-2xl md:text-4xl font-extrabold text-center uppercase text-transparent bg-clip-text tracking-tight"
-            style={{ backgroundImage: "linear-gradient(90deg,#FFFFFF,#FFD700)" }}
-          >
-            Vyber si svou úroveň
-          </h2>
-        </div>
-        <div id="pricing" className="max-w-6xl mx-auto px-6 pb-12 grid md:grid-cols-2 gap-6">
-          {/* BASIC (Starter) */}
-          <GlowCard color={COLORS.neonGreen}>
-            <div
-              id="pricing-starter"
-              className="rounded-2xl overflow-hidden"
-              style={{
-                background: "rgba(18,18,18,0.6)",
-                backdropFilter: "blur(8px)",
-                boxShadow:
-                  "inset 0 0 0 1px rgba(255,255,255,0.08), 0 0 14px rgba(255,255,255,0.06)",
-              }}
-            >
-              <div className="p-6 space-y-2">
-                <div
-                  className="text-sm uppercase tracking-wider"
-                  style={{ color: COLORS.neonGreen, textShadow: "0 0 16px rgba(57,255,20,0.55)" }}
-                >
-                  BASIC DJ
-                </div>
-                <h3 className="text-xl md:text-2xl font-bold text-white">
-                  Pro ty, co chtějí skill, prostředí a jistý progres.
-                </h3>
-                <div className="text-sm md:text-base text-white/90">
-                  <div>
-                    3 měsíce jen za <span className="font-extrabold" style={{ color: COLORS.neonGreen }}>3 899 Kč</span>{" "}
-                    <span style={{ color: COLORS.red }}>(15% sleva)</span>
-                  </div>
-                  <div>
-                    Měsíční členství jen za <span className="font-extrabold" style={{ color: COLORS.neonGold }}>1 499 Kč</span>
-                  </div>
-                </div>
-                <div className="inline-flex items-center gap-2 text-xs sm:text-sm mt-1" style={{ color: COLORS.neonGreen }}>
-                  🛡️ Pokud po 30 dnech necítíš progres → vrátíme ti peníze.
-                </div>
-              </div>
-              <div className="p-6 space-y-4">
-                <ul className="space-y-1.5 text-white/90 text-sm">
-                  <li>🎛 24/7 studio ve Fabricu</li>
-                  <li>📲 Rezervace přes appku</li>
-                  <li>💬 DJ komunita (motivace nonstop)</li>
-                  <li>🎧 Základní online content (tipy, set building, guidance)</li>
-                  <li>⚔️ Měsíční DJ Challenge</li>
-                  <li>👁 Mini feedback na tvůj progress</li>
-                  <li>🚀 Prostředí, které tě nutí růst</li>
-                </ul>
-                <div className="my-3 h-px bg-white/10" />
-                <div className="pt-1 text-white/90">
-                  <div>
-                    <span className="text-white/70">Hodnota (za vše výše):</span>{" "}
-                    <span className="font-semibold">4 000 Kč</span>
-                  </div>
-                  <div className="mt-1">
-                    <span className="text-white/70">Tvoje cena (členství):</span>{" "}
-                    <span className="font-bold" style={{ color: COLORS.neonGreen }}>1 500 Kč</span>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="text-xs sm:text-sm" style={{ color: COLORS.red }}>
-                    Zbývá míst: <span className="font-semibold">{SETTINGS.campaign.starterSeatsLeft}</span>
-                  </div>
-                  <a
-                    href={SETTINGS.ctaLinkStarter}
-                    className="rounded-2xl px-6 py-2 font-semibold transition duration-200 transform hover:-translate-y-0.5 active:translate-y-0 hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#39FF14] focus:ring-offset-black"
-                    style={{ background: COLORS.neonGreen, color: "#0a0a0a", boxShadow: "0 0 18px rgba(57,255,20,0.5)" }}
-                  >
-                    👉 Získat nabídku BASIC
-                  </a>
-                </div>
-              </div>
-            </div>
-          </GlowCard>
-
-          {/* PERFORMER (PRO) */}
-          <GlowCard color={COLORS.neonGold}>
-            <div
-              id="pricing-performer"
-              className="rounded-2xl overflow-hidden"
-              style={{
-                background: "rgba(18,18,18,0.6)",
-                backdropFilter: "blur(8px)",
-                boxShadow:
-                  "inset 0 0 0 1px rgba(255,255,255,0.08), 0 0 14px rgba(255,255,255,0.06)",
-              }}
-            >
-              <div className="p-6 space-y-2">
-                <div
-                  className="text-sm uppercase tracking-wider"
-                  style={{ color: COLORS.neonGold, textShadow: "0 0 16px rgba(255,215,0,0.55)" }}
-                >
-                  Performer DJ — PRO
-                </div>
-                <h3 className="text-xl md:text-2xl font-bold text-white">
-                  Pro ty, kteří chtějí status, viditelnost a reálné stage příležitosti.
-                </h3>
-                <div className="text-xs sm:text-sm" style={{ color: COLORS.red }}>
-                  LIMIT 10 lidí — po naplnění čekací list
-                </div>
-                <div className="text-sm md:text-base text-white/90 mt-1">
-                  <div>
-                    3 měsíce jen za <span className="font-extrabold" style={{ color: COLORS.neonGold }}>6 299 Kč</span>{" "}
-                    <span style={{ color: COLORS.red }}>(15% sleva)</span>
-                  </div>
-                  <div>
-                    Měsíční členství jen za <span className="font-extrabold" style={{ color: COLORS.neonGold }}>2 499 Kč</span>
-                  </div>
-                </div>
-                <div className="inline-flex items-center gap-2 text-xs sm:text-sm mt-1" style={{ color: COLORS.neonGold }}>
-                  🛡️ PRO Garance: Pokud do 90 dní nebudeš připraven soutěžit o stage sloty → dostaneš měsíc PRO zdarma.
-                </div>
-              </div>
-              <div className="p-6 space-y-4">
-                <div className="text-sm mb-2" style={{ color: COLORS.neonGreen }}>
-                  Získáš vše z BASIC + navíc:
-                </div>
-                <ul className="space-y-1.5 text-white/90 text-sm">
-                  <li>
-                    🔥 <strong>PREMIUM content</strong>: new music drops, producer packs, special edits, svatební hudba, advance tips
-                  </li>
-                  <li>🎛 <strong>Priority booking</strong> (přednost před BASIC)</li>
-                  <li>🧠 <strong>Hluboký měsíční feedback</strong> (rozbor setu, energie, flow)</li>
-                  <li>🥷 <strong>Uzavřená PRO Discord sekce</strong></li>
-                  <li>🏆 <strong>Přednost v contestech</strong> na reálné stage</li>
-                  <li>🎤 <strong>GIG TRACK</strong> – cesta, jak se dostaneš na stage venku</li>
-                  <li>🎫 <strong>Backstage Meet & Learn</strong> sessions</li>
-                  <li>📸 <strong>Viditelnost</strong>: stories, videa, promo záběry</li>
-                  <li>🏅 <strong>PRO Badge</strong> — status v komunitě</li>
-                </ul>
-                <div className="my-3 h-px bg-white/10" />
-                <div className="pt-1 text-white/90">
-                  <div>
-                    <span className="text-white/70">Hodnota (za vše výše):</span>{" "}
-                    <span className="font-semibold">8 000 Kč</span>
-                  </div>
-                  <div className="mt-1">
-                    <span className="text-white/70">Tvoje cena (členství):</span>{" "}
-                    <span className="font-bold" style={{ color: COLORS.neonGold }}>2 500 Kč</span>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="text-xs sm:text-sm" style={{ color: COLORS.red }}>
-                    Zbývá míst: <span className="font-semibold">{SETTINGS.campaign.performerSeatsLeft}</span>
-                  </div>
-                  <div className="flex flex-col items-end">
-                    <a
-                      href={SETTINGS.ctaLinkPerformer}
-                      className="rounded-2xl px-6 py-2 font-bold transition duration-200 transform hover:-translate-y-0.5 active:translate-y-0 hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FFD700] focus:ring-offset-black"
-                      style={{ background: COLORS.neonGold, color: "#0a0a0a", boxShadow: "0 0 22px rgba(255,215,0,0.6)" }}
-                    >
-                      🔥 Získat nabídku PERFORMER
-                    </a>
-                    <div className="mt-1 text-xs" style={{ color: COLORS.red, opacity: 0.9 }}>
-                      Dokud jsou místa.
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </GlowCard>
-        </div>
-
-        {/* TEAM / ABOUT */}
-        <div className="max-w-6xl mx-auto px-6 pb-10">
-          <h2
-            className="text-2xl md:text-4xl font-extrabold text-center uppercase text-transparent bg-clip-text tracking-tight"
-            style={{ backgroundImage: "linear-gradient(90deg,#FFFFFF,#FFD700)" }}
-          >
-            Kdo za tím stojí?
-          </h2>
-          <div className="mt-3 max-w-3xl mx-auto text-center text-white/90 text-base md:text-lg leading-relaxed">
-            DJs hrající na největších stage v ČR: <strong>Colours of Ostrava</strong>, <strong>Beats 4 Love</strong>, klubové noci, velké eventy, soukromé eventy.
-            <br />
-            <span className="inline-block mt-2">Neučíme teorii. Předáváme reálné zkušenosti ze stage.</span>
-          </div>
-          <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div
-                key={`mentor-${i}`}
-                className="aspect-[5/3] rounded-xl bg-white/5 flex items-center justify-center text-white/70 text-sm"
-                style={{ boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.08)" }}
-              >
-                Foto / jméno mentora {i + 1}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* REVIEWS */}
-        <div className="max-w-6xl mx-auto px-6 pb-10">
-          <h2
-            className="text-2xl md:text-4xl font-extrabold text-center uppercase text-transparent bg-clip-text tracking-tight"
-            style={{ backgroundImage: "linear-gradient(90deg,#FFFFFF,#FFD700)" }}
-          >
-            Co si o TR komunitě myslí lidé, kteří u nás hráli.
-          </h2>
-          <div className="mt-6 grid md:grid-cols-3 gap-4">
-            {[1, 2, 3].map((i) => (
-              <div
-                key={`review-${i}`}
-                className="rounded-2xl p-5 text-white"
-                style={{
-                  background: "rgba(18,18,18,0.6)",
-                  backdropFilter: "blur(8px)",
-                  boxShadow:
-                    "inset 0 0 0 1px rgba(255,255,255,0.08), 0 0 14px rgba(255,255,255,0.06)",
-                }}
-              >
-                <div className="text-sm">⭐️⭐️⭐️⭐️⭐️</div>
-                <p className="mt-2 text-white/90 text-sm">
-                  „Skvělé prostředí, real feedback a první booking mimo klub díky TR. Doporučuju.“
-                </p>
-                <div className="mt-3 text-xs text-white/70">— Člen komunity</div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* PARTNEŘI */}
-        <div className="max-w-6xl mx-auto px-6 pb-12">
-          <h2
-            className="text-2xl md:text-3xl font-extrabold text-center uppercase text-transparent bg-clip-text tracking-tight"
-            style={{ backgroundImage: "linear-gradient(90deg,#FFFFFF,#FFD700)" }}
-          >
-            Partneři
-          </h2>
-          <LogosScroller />
-        </div>
-
-        {/* FAQ */}
-        <div className="max-w-6xl mx-auto px-6 pb-12">
-          <h2
-            className="text-2xl md:text-4xl font-extrabold text-center uppercase text-transparent bg-clip-text tracking-tight"
-            style={{ backgroundImage: "linear-gradient(90deg,#FFFFFF,#FFD700)" }}
-          >
-            Často kladené otázky
-          </h2>
-          <div className="mt-6 space-y-3">
-            {[
-              {
-                q: "Jak zruším členství?",
-                a: "Po úvodních 3 měsících přecházíš na měsíční platbu, kterou můžeš kdykoliv ukončit – bez skrytých poplatků.",
-              },
-              {
-                q: "Co když nemám zkušenost s CDJ‑3000?",
-                a: "Pomůžeme s nastavením a workflow. Máme krátký onboarding a doporučené sety na rozjezd.",
-              },
-              { q: "Je cena s DPH?", a: "Ano, všechny částky uvádíme včetně DPH." },
-              {
-                q: "Co přesně je v New Music Packu?",
-                a: "Každý měsíc kurátorované bangery, remixy, edity a mashupy z placených zdrojů.",
-              },
-              {
-                q: "Jak funguje 14denní garance?",
-                a: "Když během 14 dní zjistíš, že to není pro tebe, napiš nám a platbu vrátíme.",
-              },
-            ].map((item, idx) => (
-              <details
-                key={`faq-${idx}`}
-                className="rounded-xl p-4 bg-white/5 text-white"
-                style={{ boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.08)" }}
-              >
-                <summary className="cursor-pointer font-semibold">{item.q}</summary>
-                <p className="mt-2 text-white/90">{item.a}</p>
-              </details>
-            ))}
-          </div>
-        </div>
-
-        {/* Final CTA */}
-        <div className="border-t" style={{ borderColor: "#1a1a1a" }}>
-          <div className="max-w-6xl mx-auto px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-4">
-            <div>
-              <div className="text-lg md:text-xl font-extrabold text-white">
-                Připraven posunout svůj DJ level?
-              </div>
-              <div className="text-white">
-                Vyber si balíček a rezervuj si místo, než se kapacita naplní.
-              </div>
-            </div>
-            <div className="flex gap-3">
-              <a
-                href={SETTINGS.ctaLinkStarter}
-                className="rounded-2xl px-6 py-2 font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#39FF14] focus:ring-offset-black"
-                style={{ background: COLORS.neonGreen, color: "#0a0a0a", boxShadow: "0 0 18px rgba(57,255,20,0.5)" }}
-              >
-                Získat nabídku BASIC
-              </a>
-              <a
-                href={SETTINGS.ctaLinkPerformer}
-                className="rounded-2xl px-6 py-2 font-bold focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FFD700] focus:ring-offset-black"
-                style={{ background: COLORS.neonGold, color: "#0a0a0a", boxShadow: "0 0 22px rgba(255,215,0,0.6)" }}
-              >
-                Získat nabídku PERFORMER
-              </a>
-            </div>
-          </div>
+    <!-- ========== SEKCE 1: HERO (full-width background image layer) ========== -->
+    <main class="layer heroLayer hasBg" id="top" style="--bg-img: url('hero-bg.jpg');" aria-label="Přistávací náhled">
+      <section class="layerInner reveal">
+        <h1 class="heroH1">CHCEŠ SE NAUČIT PROMĚNIT SKILL<br>V PUBLIKUM A PŘÍLEŽITOST?</h1>
+        <p class="heroH2">Komunita pro DJs, kteří chtějí růst, být vidět a dostat se na další level.</p>
+        <div style="display:flex;justify-content:center;margin-top:18px;">
+          <a class="btn btnPrimary" id="ctaMain" href="#kontakt">Jak vám můžeme pomoci?</a>
         </div>
       </section>
-    );
-  }
+    </main>
 
-  // Return inner component (keeps module names unique)
-  return TR_AppInner;
-})();
+    <!-- ========== SEKCE 2: MODELY (3 produkty vedle sebe) ========== -->
+    <section class="layer layerAlt layerLight" id="modely" aria-label="Modely">
+      <div class="layerInner reveal">
+        <h2 class="sectionTitle">VYBER SI ČLENSTVÍ KTERÉ TĚ POSUNE.</h2>
+        <p class="sectionText">ZJISTI VÍCE</p>
 
-export default TR_App;
+        <div class="products" aria-label="Modely vedle sebe">
+
+          <article class="product" aria-label="Online model">
+            <h3 class="productTitle">ONLINE ACCESS</h3>
+            <div class="productMedia">
+              <button class="productImageBtn" type="button" data-model="online" aria-label="Odkryj Online Access">
+                <div class="productImage" style="--img: url('online-model.jpg');" role="img" aria-label="Online Access obrázek"></div>
+              </button>
+            </div>
+            <div class="productCtaUnder">
+              <a class="btn btnPrimary btnSmall" href="#kontakt">Vybrat Online Acess</a>
+            </div>
+          </article>
+
+          <article class="product" aria-label="Studio model">
+            <h3 class="productTitle">STUDIO ACCESS</h3>
+            <div class="productMedia">
+              <button class="productImageBtn" type="button" data-model="hybrid" aria-label="Odkryj Studio Access">
+                <div class="productImage" style="--img: url('hybrid-model.jpg');" role="img" aria-label="Studio Access obrázek"></div>
+              </button>
+            </div>
+            <div class="productCtaUnder">
+              <a class="btn btnPrimary btnSmall" href="#kontakt">Požádat o Studio Acess</a>
+            </div>
+          </article>
+
+          <article class="product" aria-label="Mentoring model">
+            <h3 class="productTitle">MENTORING ACCESS</h3>
+            <div class="productMedia">
+              <button class="productImageBtn" type="button" data-model="engine" aria-label="Odkryj Mentoring Access">
+                <div class="productImage" style="--img: url('engine-model.jpg');" role="img" aria-label="Mentoring Access obrázek"></div>
+              </button>
+            </div>
+            <div class="productCtaUnder">
+              <a class="btn btnPrimary btnSmall" href="#kontakt">Požádat o Mentoring</a>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== MEZI-LAYER: PARTNEŘI ========== -->
+    <section class="layer partnersLayer" id="partneri" aria-label="Partneři">
+      <div class="layerInner reveal">
+        <div class="partnersBar" aria-label="Logo carousel">
+          <div class="partnersMarquee" aria-label="Loga partnerů (carousel)">
+            <div class="partnersTrack" role="list" aria-label="Loga partnerů">
+              <!-- Set A -->
+              <div class="partnersRow" aria-hidden="false">
+                <img class="partnerLogo" role="listitem" alt="Partner 1" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='44'%3E%3Crect width='160' height='44' rx='12' fill='%23ffffff'/%3E%3Ctext x='50%25' y='56%25' text-anchor='middle' font-family='Montserrat,Arial' font-size='16' font-weight='800' fill='%23111111'%3ELOGO%201%3C/text%3E%3C/svg%3E" />
+                <img class="partnerLogo" role="listitem" alt="Partner 2" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='44'%3E%3Crect width='160' height='44' rx='12' fill='%23ffffff'/%3E%3Ctext x='50%25' y='56%25' text-anchor='middle' font-family='Montserrat,Arial' font-size='16' font-weight='800' fill='%23111111'%3ELOGO%202%3C/text%3E%3C/svg%3E" />
+                <img class="partnerLogo" role="listitem" alt="Partner 3" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='44'%3E%3Crect width='160' height='44' rx='12' fill='%23ffffff'/%3E%3Ctext x='50%25' y='56%25' text-anchor='middle' font-family='Montserrat,Arial' font-size='16' font-weight='800' fill='%23111111'%3ELOGO%203%3C/text%3E%3C/svg%3E" />
+                <img class="partnerLogo" role="listitem" alt="Partner 4" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='44'%3E%3Crect width='160' height='44' rx='12' fill='%23ffffff'/%3E%3Ctext x='50%25' y='56%25' text-anchor='middle' font-family='Montserrat,Arial' font-size='16' font-weight='800' fill='%23111111'%3ELOGO%204%3C/text%3E%3C/svg%3E" />
+                <img class="partnerLogo" role="listitem" alt="Partner 5" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='44'%3E%3Crect width='160' height='44' rx='12' fill='%23ffffff'/%3E%3Ctext x='50%25' y='56%25' text-anchor='middle' font-family='Montserrat,Arial' font-size='16' font-weight='800' fill='%23111111'%3ELOGO%205%3C/text%3E%3C/svg%3E" />
+              </div>
+
+              <!-- Set B (duplicate for seamless loop) -->
+              <div class="partnersRow" aria-hidden="true">
+                <img class="partnerLogo" alt="Partner 1" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='44'%3E%3Crect width='160' height='44' rx='12' fill='%23ffffff'/%3E%3Ctext x='50%25' y='56%25' text-anchor='middle' font-family='Montserrat,Arial' font-size='16' font-weight='800' fill='%23111111'%3ELOGO%201%3C/text%3E%3C/svg%3E" />
+                <img class="partnerLogo" alt="Partner 2" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='44'%3E%3Crect width='160' height='44' rx='12' fill='%23ffffff'/%3E%3Ctext x='50%25' y='56%25' text-anchor='middle' font-family='Montserrat,Arial' font-size='16' font-weight='800' fill='%23111111'%3ELOGO%202%3C/text%3E%3C/svg%3E" />
+                <img class="partnerLogo" alt="Partner 3" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='44'%3E%3Crect width='160' height='44' rx='12' fill='%23ffffff'/%3E%3Ctext x='50%25' y='56%25' text-anchor='middle' font-family='Montserrat,Arial' font-size='16' font-weight='800' fill='%23111111'%3ELOGO%203%3C/text%3E%3C/svg%3E" />
+                <img class="partnerLogo" alt="Partner 4" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='44'%3E%3Crect width='160' height='44' rx='12' fill='%23ffffff'/%3E%3Ctext x='50%25' y='56%25' text-anchor='middle' font-family='Montserrat,Arial' font-size='16' font-weight='800' fill='%23111111'%3ELOGO%204%3C/text%3E%3C/svg%3E" />
+                <img class="partnerLogo" alt="Partner 5" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='44'%3E%3Crect width='160' height='44' rx='12' fill='%23ffffff'/%3E%3Ctext x='50%25' y='56%25' text-anchor='middle' font-family='Montserrat,Arial' font-size='16' font-weight='800' fill='%23111111'%3ELOGO%205%3C/text%3E%3C/svg%3E" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== SEKCE 3: MISE ========== -->
+    <section class="layer layerAlt" id="mise" aria-label="Mise">
+      <div class="layerInner reveal">
+        <h2 class="sectionTitle">MISE TALENT ROOM</h2>
+        <p class="sectionText">Talent Room není další komunita. Je to systém spolupráce, který pomáhá talentu nezůstat neviditelný.</p>
+
+        <div class="missionIntro">
+          <p><strong>Česká DJ scéna není malá.</strong> Ani slabá. Ani nekvalitní. Je roztříštěná — ne proto, že by lidé neuměli hrát, ale protože chybí společný systém spolupráce.</p>
+        </div>
+
+        <div class="missionRows" aria-label="Mise sekce">
+
+          <div class="missionRow">
+            <div class="missionCard">
+              <h3>Proč Talent Room vznikl</h3>
+              <p>Každý bojuje sám. A tím se ztrácí potenciál celé scény. Talent Room vznikl jako místo, kde se sdílení stává výhodou — ne rizikem.</p>
+              <p><strong>Spolupráce</strong> místo rivality. <strong>Systém</strong> místo náhody. <strong>Růst</strong> místo přežívání.</p>
+            </div>
+            <div class="missionMedia" style="--img: url('mission-1.jpg');" aria-label="Mise obrázek 1">
+              <div class="missionMediaLabel">Spolupráce</div>
+            </div>
+          </div>
+
+          <div class="missionRow swap">
+            <div class="missionCard">
+              <h3>Jak to vidíme</h3>
+              <p><strong>DJing pro nás není cíl.</strong> Je to vstupní bod. Dnes už nestačí jen „umět hrát“. Rozhodují výstupy, viditelnost a další krok — postavené na systému.</p>
+              <ul>
+                <li><strong>Skill sám nestačí</strong> — změna přichází přes výstupy.</li>
+                <li><strong>Prostředí formuje výkon</strong> — systém porazí chaos.</li>
+                <li><strong>Spolupráce porazí konkurenci</strong> — roste celá scéna.</li>
+              </ul>
+            </div>
+            <div class="missionMedia" style="--img: url('mission-2.jpg');" aria-label="Mise obrázek 2">
+              <div class="missionMediaLabel">Output</div>
+            </div>
+          </div>
+
+          <div class="missionRow">
+            <div class="missionCard">
+              <h3>Co u nás najdeš</h3>
+              <p>Komunitu, kde si lidé pomáhají technicky i lidsky. Kde se sdílí akce napříč republikou. Kde vznikají spolupráce místo rivality.</p>
+              <p>Podporu v technice, tvorbě, contentu, organizaci akcí, marketingu — a taky v moderních nástrojích (AI & automatizace), které šetří čas a zrychlují progres.</p>
+            </div>
+            <div class="missionMedia" style="--img: url('mission-3.jpg');" aria-label="Mise obrázek 3">
+              <div class="missionMediaLabel">Prostředí</div>
+            </div>
+          </div>
+
+          <div class="missionRow swap">
+            <div class="missionCard">
+              <h3>Pro koho Talent Room je</h3>
+              <p>Pro DJs, producenty a kreativce, kteří chtějí růst. Kteří nehledají jen místo na trénink — ale směr, systém a prostředí, které je udrží v pohybu.</p>
+              <p><strong>Talent Room je místo, kde se talent přestává ztrácet v tichu.</strong></p>
+            </div>
+            <div class="missionMedia" style="--img: url('mission-4.jpg');" aria-label="Mise obrázek 4">
+              <div class="missionMediaLabel">Směr</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== SEKCE 4: FAQ ========== -->
+    <section class="layer layerAlt" id="faq" aria-label="FAQ">
+      <div class="layerInner reveal">
+        <h2 class="sectionTitle">FAQ</h2>
+        <p class="sectionText">Rychlé odpovědi, než se přidáš.</p>
+
+        <div class="faqWrap">
+          <details class="faqItem">
+            <summary>
+              Je to kurz pro začátečníky?
+              <span class="faqIcon">＋</span>
+            </summary>
+            <div class="faqBody">Ne. Talent Room je pro lidi, co už mají základní skill a chtějí ho proměnit v výstupy, publikum a další krok.</div>
+          </details>
+
+          <details class="faqItem">
+            <summary>
+              Co když nemám čas každý den?
+              <span class="faqIcon">＋</span>
+            </summary>
+            <div class="faqBody">Stačí <strong>konzistence</strong>. Systém je nastavený tak, aby tě vedl k týdenním výstupům — ne k dennímu grindování.</div>
+          </details>
+
+          <details class="faqItem">
+            <summary>
+              Budu mít co postovat, i když nejsem „content creator“?
+              <span class="faqIcon">＋</span>
+            </summary>
+            <div class="faqBody">Ano. Dostaneš strukturu, šablony a tlak na výstupy. Neučíme virály. Učíme <strong>output</strong>, který buduje důvěru.</div>
+          </details>
+
+          <details class="faqItem">
+            <summary>
+              Jak funguje měsíční DJ tools drop?
+              <span class="faqIcon">＋</span>
+            </summary>
+            <div class="faqBody">Každý měsíc dostaneš kurátorované edity / remixy / producer packy, které šetří čas a zrychlí tvoje sety i obsah.</div>
+          </details>
+
+          <details class="faqItem">
+            <summary>
+              Můžu začít Online a později přejít dál?
+              <span class="faqIcon">＋</span>
+            </summary>
+            <div class="faqBody">Jo. Online je základní motor. Studio zrychluje a Mentoring je pro ty, co chtějí vedení a nejrychlejší posun.</div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== SEKCE 5: KONTAKT (placeholder) ========== -->
+    <section class="layer layerAlt" id="kontakt" aria-label="Kontakt">
+      <div class="layerInner reveal">
+        <h2 class="sectionTitle">Kontakt</h2>
+        <p class="sectionText">Tady bude formulář / CTA. (Zatím placeholder.)</p>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- MODAL -->
+  <div class="modal" id="modelModal" aria-hidden="true">
+    <div class="modalPanel" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modalTop">
+        <div>
+          <h3 class="modalTitle" id="modalTitle">MODEL</h3>
+          <div class="modalPrice" id="modalPrice">Cena</div>
+        </div>
+
+        <div class="modalActions">
+          <!-- CTA nahoře v prokliku na produkt -->
+          <a class="btn btnPrimary btnSmall" href="#kontakt" id="modalTopCta">Získat</a>
+          <button class="modalClose" type="button" id="modalClose" aria-label="Zavřít">✕</button>
+        </div>
+      </div>
+
+      <div class="modalBody" id="modalBody"></div>
+
+      <div class="modalFooter" id="modalFooter">
+        <a class="btn btnPrimary btnSmall" href="#kontakt" id="modalCta">Získat</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEMPLATES -->
+  <template id="tpl-online">
+    <p><strong>Podtitul</strong><br>Základní systém, který promění tvůj skill ve výstupy.</p>
+
+    <p><strong>ONLINE ACCESS</strong> je vstupní bod do Talent Room.</p>
+    <p>Není to kurz.<br>Není to knihovna.<br>Je to strukturovaný systém, který tě přestane nechávat tápat.</p>
+
+    <h4>Pokud máš skill, ale…</h4>
+    <ul>
+      <li>nevíš, co přesně dělat každý týden</li>
+      <li>nemáš konzistentní výstupy</li>
+      <li>stagnuješ mezi tréninkem a realitou</li>
+    </ul>
+    <p>→ Dostaneš řád, tlak a směr.</p>
+
+    <h4>Co přesně získáš</h4>
+    <ul>
+      <li><strong>90denní roadmapu</strong> s jasnými týdenními výstupy</li>
+      <li><strong>Promo & content systém</strong>, který tě naučí být vidět bez chaosu</li>
+      <li><strong>Accountability</strong> (ne motivaci, ale tlak)</li>
+      <li><strong>Uzavřenou online komunitu</strong> (přístup jen pro aktivní členy)</li>
+    </ul>
+
+    <h4>Měsíční DJ TOOLS DROP</h4>
+    <ul>
+      <li>edity, remixy, bootlegy</li>
+      <li>producer packy & samplery</li>
+      <li>vše připravené k okamžitému použití</li>
+    </ul>
+
+    <p><em>Neučíme tě „víc hudby“.</em><br>Učíme tě přestat být neviditelný.</p>
+  </template>
+
+  <template id="tpl-hybrid">
+    <p><strong>Podtitul</strong><br>Systém + prostor + kontrolovaný přístup. Rychlejší výstupy.</p>
+
+    <p><strong>STUDIO ACCESS</strong> je pro ty, kdo chtějí víc než online.</p>
+    <p>Protože realita je jednoduchá:<br><strong>Prostředí rozhoduje o výkonu.</strong></p>
+
+    <h4>Doma:</h4>
+    <ul>
+      <li>odkládáš</li>
+      <li>rozptyluješ se</li>
+      <li>nemáš tlak</li>
+    </ul>
+
+    <p>Studio Access ti dává fyzické prostředí, kde:</p>
+    <ul>
+      <li>se pracuje</li>
+      <li>vzniká obsah</li>
+      <li>vznikají výstupy</li>
+    </ul>
+    <p>Bez chaosu. Bez náhodných lidí.</p>
+
+    <h4>Co přesně získáš</h4>
+    <ul>
+      <li><strong>Vše z Online Access</strong></li>
+      <li>Přístup do DJ room / cowork prostoru</li>
+      <li>Rezervační systém (jasná pravidla, žádný boj o čas)</li>
+      <li>Nahrávání setů, streamů a contentu</li>
+      <li>Fokus bloky (hlavně dopoledne)</li>
+      <li>Uzavřený Discord pouze pro aktivní členy</li>
+    </ul>
+
+    <p><em>Studio není zkušebna.</em><br>Studio je nástroj na výstupy.</p>
+  </template>
+
+  <template id="tpl-engine">
+    <p><strong>Podtitul</strong><br>Mentoring, priorita a nejrychlejší posun.</p>
+
+    <p><strong>MENTORING ACCESS</strong> je nejvyšší úroveň Talent Room.</p>
+    <p>Není pro každého. A ani nemá být.</p>
+
+    <p>Je pro ty, kdo:</p>
+    <ul>
+      <li>chtějí jasný směr</li>
+      <li>chtějí zpětnou vazbu</li>
+      <li>chtějí být vedeni</li>
+    </ul>
+
+    <h4>Bez mentoringu:</h4>
+    <ul>
+      <li>děláš zbytečné chyby</li>
+      <li>nevíš, co zlepšit dřív</li>
+      <li>ztrácíš čas</li>
+    </ul>
+
+    <h4>Co přesně získáš</h4>
+    <ul>
+      <li>Limitovaný přístup (malý počet členů)</li>
+      <li>Mentoring 1:many</li>
+      <li>Detailní feedback na sety, content a směr</li>
+      <li>Pomoc s dalšími kroky (publikum, bookingy, positioning)</li>
+      <li>Prioritu v systému</li>
+    </ul>
+
+    <p><em>Neslibujeme úspěch.</em><br>Dáváme ti nejlepší možnou šanci.</p>
+  </template>
+
+  <script>
+    (function(){
+      'use strict';
+
+      // Reveal on scroll
+      const trRevealEls = document.querySelectorAll('.reveal');
+      const trObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-in');
+            trObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+
+      trRevealEls.forEach((el) => trObserver.observe(el));
+
+      // CTA smooth scroll
+      const trCtaMain = document.getElementById('ctaMain');
+      if (trCtaMain) {
+        trCtaMain.addEventListener('click', (e) => {
+          e.preventDefault();
+          const trTarget = document.getElementById('kontakt');
+          if (trTarget) trTarget.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      }
+
+      // ===== Modal logic =====
+      const trModal = document.getElementById('modelModal');
+      const trModalClose = document.getElementById('modalClose');
+      const trModalTitle = document.getElementById('modalTitle');
+      const trModalPrice = document.getElementById('modalPrice');
+      const trModalBody = document.getElementById('modalBody');
+      const trModalCta = document.getElementById('modalCta');
+      const trModalTopCta = document.getElementById('modalTopCta');
+
+      const TR_MODEL_META = {
+        online: {
+          title: 'ONLINE ACCESS',
+          price: '690 Kč / měsíc',
+          tpl: 'tpl-online',
+          ctaText: 'Vybrat Online Acess',
+          ctaHref: '#kontakt'
+        },
+        hybrid: {
+          title: 'STUDIO ACCESS',
+          price: '1 490 Kč / měsíc',
+          tpl: 'tpl-hybrid',
+          ctaText: 'Požádat o Studio Acess',
+          ctaHref: '#kontakt'
+        },
+        engine: {
+          title: 'MENTORING ACCESS',
+          price: 'od 3 000 Kč / měsíc (limit)',
+          tpl: 'tpl-engine',
+          ctaText: 'Požádat o Mentoring',
+          ctaHref: '#kontakt'
+        }
+      };
+
+      function trOpenModal(key){
+        const meta = TR_MODEL_META[key];
+        if(!meta || !trModal) return;
+
+        trModalTitle.textContent = meta.title;
+        trModalPrice.textContent = meta.price;
+
+        if(trModalCta){
+          trModalCta.textContent = meta.ctaText;
+          trModalCta.setAttribute('href', meta.ctaHref);
+        }
+        if(trModalTopCta){
+          trModalTopCta.textContent = meta.ctaText;
+          trModalTopCta.setAttribute('href', meta.ctaHref);
+        }
+
+        const tpl = document.getElementById(meta.tpl);
+        trModalBody.innerHTML = '';
+        if(tpl && 'content' in tpl){
+          trModalBody.appendChild(tpl.content.cloneNode(true));
+        }
+
+        trModal.classList.add('isOpen');
+        trModal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function trCloseModal(){
+        if(!trModal) return;
+        trModal.classList.remove('isOpen');
+        trModal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      }
+
+      document.querySelectorAll('.productImageBtn').forEach(btn => {
+        btn.addEventListener('click', () => trOpenModal(btn.dataset.model));
+      });
+
+      if(trModalClose){ trModalClose.addEventListener('click', trCloseModal); }
+
+      if(trModal){
+        trModal.addEventListener('click', (e) => {
+          if(e.target === trModal) trCloseModal();
+        });
+      }
+
+      window.addEventListener('keydown', (e) => {
+        if(e.key === 'Escape' && trModal && trModal.classList.contains('isOpen')) trCloseModal();
+      });
+
+      // ===== Product Glow (subtle) =====
+      const trGlowTargets = Array.from(document.querySelectorAll('.productImage'));
+      const trGlowCfg = { proximity: 72, inactiveZone: 0.18 };
+      let trGlowRaf = 0;
+      let trLastPointer = { x: 0, y: 0 };
+
+      function trUpdateGlow(){
+        trGlowRaf = 0;
+        const x = trLastPointer.x;
+        const y = trLastPointer.y;
+
+        trGlowTargets.forEach((el) => {
+          const r = el.getBoundingClientRect();
+          const cx = r.left + r.width * 0.5;
+          const cy = r.top + r.height * 0.5;
+
+          const dist = Math.hypot(x - cx, y - cy);
+          const inactiveRadius = 0.5 * Math.min(r.width, r.height) * trGlowCfg.inactiveZone;
+
+          if(dist < inactiveRadius){
+            el.style.setProperty('--glowActive', '0');
+            return;
+          }
+
+          const isActive =
+            x > r.left - trGlowCfg.proximity &&
+            x < r.right + trGlowCfg.proximity &&
+            y > r.top - trGlowCfg.proximity &&
+            y < r.bottom + trGlowCfg.proximity;
+
+          el.style.setProperty('--glowActive', isActive ? '1' : '0');
+          if(!isActive) return;
+
+          const angle = (Math.atan2(y - cy, x - cx) * 180) / Math.PI + 90;
+          el.style.setProperty('--glowAngle', angle + 'deg');
+        });
+      }
+
+      document.addEventListener('pointermove', (e) => {
+        trLastPointer = { x: e.clientX, y: e.clientY };
+        if(!trGlowRaf) trGlowRaf = requestAnimationFrame(trUpdateGlow);
+      }, { passive:true });
+
+      window.addEventListener('scroll', () => {
+        if(!trGlowRaf) trGlowRaf = requestAnimationFrame(trUpdateGlow);
+      }, { passive:true });
+
+      // ===== sanity checks =====
+      console.assert(document.querySelectorAll('.product').length === 3, 'Exactly 3 product cards should exist');
+      console.assert(document.querySelectorAll('.productImageBtn').length === 3, 'Exactly 3 product buttons should exist');
+      console.assert(!!document.getElementById('tpl-online'), 'Template tpl-online should exist');
+      console.assert(!!document.getElementById('tpl-hybrid'), 'Template tpl-hybrid should exist');
+      console.assert(!!document.getElementById('tpl-engine'), 'Template tpl-engine should exist');
+      console.assert(!!document.getElementById('partneri'), 'Section #partneri should exist');
+      console.assert(!!document.getElementById('modelModal'), 'Modal #modelModal should exist');
+      console.assert(Object.keys(TR_MODEL_META).length === 3, 'TR_MODEL_META must have 3 keys');
+    })();
+  </script>
+</body>
+</html>
