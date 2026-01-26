@@ -9,7 +9,7 @@
   <!-- Font: Montserrat -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
     :root{
@@ -20,8 +20,8 @@
       --line:rgba(255,255,255,.10);
 
       /* BRAND GOLD */
-      --accent:#E49510;          /* hlavní zlatá */
-      --accentDeep:#D87500;      /* klik / aktivní */
+      --accent:#E49510;
+      --accentDeep:#D87500;
 
       --shadow:0 18px 60px rgba(0,0,0,.55);
       --radius:22px;
@@ -32,7 +32,7 @@
 
     html,body{
       margin:0;
-      font-family:"Montserrat", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      font-family:"Montserrat", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Helvetica, Arial;
       background:
         radial-gradient(1100px 600px at 18% -10%, rgba(228,149,16,.18), transparent 60%),
         radial-gradient(900px 500px at 92% 0%, rgba(228,149,16,.12), transparent 55%),
@@ -77,7 +77,7 @@
       z-index:30;
       backdrop-filter:blur(14px);
       -webkit-backdrop-filter:blur(14px);
-      background:var(--accent); /* jednotná barva */
+      background:var(--accent);
       border-bottom:1px solid rgba(0,0,0,.10);
     }
 
@@ -100,7 +100,6 @@
       color:rgba(0,0,0,.92);
     }
 
-    /* logo placeholder (můžeš vyměnit SVG/PNG) */
     .logo{
       width:38px;
       height:38px;
@@ -130,43 +129,31 @@
     nav{
       display:flex;
       align-items:center;
-      gap:14px;
-      color:rgba(0,0,0,.74);
-      font-size:14px;
-      font-weight:800;
+      gap:10px;
+      color:rgba(0,0,0,.78);
+      font-size:13px;
+      font-weight:900;
+      letter-spacing:.06em;
+      text-transform:uppercase;
     }
 
     nav a{
-      padding:10px 10px;
-      border-radius:12px;
-      transition:background .2s ease, color .2s ease;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(0,0,0,.14);
+      background:rgba(255,255,255,.22);
+      box-shadow:0 10px 30px rgba(0,0,0,.10);
+      transition:background .18s ease, transform .18s ease, border-color .18s ease, color .18s ease;
     }
 
     nav a:hover{
-      background:rgba(0,0,0,.06);
+      background:rgba(255,255,255,.34);
+      border-color:rgba(0,0,0,.22);
       color:rgba(0,0,0,.92);
-    }
-
-    .ctaTop{
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      padding:10px 14px;
-      border-radius:14px;
-      border:1px solid rgba(0,0,0,.14);
-      background:rgba(255,255,255,.35);
-      transition:transform .2s ease, background .2s ease, border-color .2s ease;
-      box-shadow:0 10px 40px rgba(0,0,0,.16);
-      white-space:nowrap;
-      color:rgba(0,0,0,.90);
-      font-weight:900;
-    }
-
-    .ctaTop:hover{
       transform:translateY(-1px);
-      background:rgba(255,255,255,.50);
-      border-color:rgba(0,0,0,.20);
     }
+
+    nav a:active{ transform:translateY(0); }
 
     /* Buttons */
     .btn{
@@ -181,7 +168,7 @@
       border:1px solid rgba(255,255,255,.14);
       background:rgba(255,255,255,.06);
       color:var(--text);
-      transition:transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+      transition:transform .2s ease, border-color .2s ease, box-shadow .2s ease, background .2s ease;
       cursor:pointer;
       user-select:none;
       box-shadow:0 10px 40px rgba(0,0,0,.30);
@@ -189,28 +176,41 @@
     }
 
     .btn:hover{ transform:translateY(-1px); }
-
     .btn:active{ transform:translateY(0); }
 
     .btnPrimary{
       border-color:rgba(228,149,16,.55);
-      background:var(--accent); /* jednotná barva */
+      background:var(--accent);
       color:rgba(0,0,0,.92);
       box-shadow:0 16px 55px rgba(228,149,16,.18);
     }
 
-    /* pouze změna barvy při kliknutí */
     .btnPrimary:active{
       background:var(--accentDeep);
       border-color:rgba(216,117,0,.75);
       box-shadow:0 16px 55px rgba(216,117,0,.22);
     }
 
-    .btnSmall{
-      padding:12px 14px;
-      border-radius:14px;
-      font-size:14px;
+    .btnGhost{
+      border-color:rgba(255,255,255,.22);
+      background:rgba(0,0,0,.18);
+      color:rgba(255,255,255,.92);
+      box-shadow:0 10px 40px rgba(0,0,0,.26);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
+
+    .btnGhost:hover{
+      background:rgba(0,0,0,.22);
+      border-color:rgba(228,149,16,.38);
+    }
+
+    .btnGhost:active{
+      background:rgba(0,0,0,.26);
+      border-color:rgba(216,117,0,.42);
+    }
+
+    .btnSmall{ padding:12px 14px; border-radius:14px; font-size:14px; }
 
     /* Sections */
     .layer{
@@ -241,7 +241,6 @@
         linear-gradient(180deg, rgba(11,12,16,.92), rgba(11,12,16,.98));
     }
 
-    /* HERO background image layer (full width) */
     .hasBg::after{
       content:"";
       position:absolute;
@@ -256,9 +255,14 @@
       z-index:0;
     }
 
-    .heroLayer{
-      min-height:86vh;
-      padding:86px 0 60px;
+    .heroLayer{ min-height:80vh; padding:72px 0 54px; }
+
+    .heroCtas{
+      display:flex;
+      justify-content:center;
+      gap:12px;
+      margin-top:28px;
+      flex-wrap:wrap;
     }
 
     .heroH1{
@@ -266,8 +270,8 @@
       max-width:28ch;
       font-weight:900;
       text-transform:uppercase;
-      letter-spacing:-0.035em;
-      line-height:1.08;
+      letter-spacing:-0.02em;
+      line-height:1.06;
       font-size:clamp(30px, 4.2vw, 50px);
       color:rgba(255,255,255,.96);
       text-shadow:0 18px 60px rgba(0,0,0,.55);
@@ -285,7 +289,40 @@
       .heroH2{ white-space:nowrap; }
     }
 
-    /* Titles */
+    /* HERO bottom stat */
+    .heroBottomStat{
+      position:absolute;
+      left:50%;
+      bottom:18px;
+      transform:translateX(-50%);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:12px;
+      font-size:clamp(13px, 1.3vw, 15px);
+      font-weight:900;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      white-space:nowrap;
+      z-index:10;
+    }
+
+    .heroBottomStat .sep{
+      color:var(--accent);
+      font-weight:900;
+      letter-spacing:0;
+      text-shadow:0 2px 12px rgba(0,0,0,.8);
+    }
+
+    .heroBottomStat .statText{
+      color:#fff;
+      text-shadow:0 2px 8px rgba(0,0,0,.9), 0 4px 24px rgba(0,0,0,.7), 0 0 40px rgba(0,0,0,.5);
+    }
+
+    @media (max-width: 920px){
+      .heroBottomStat{ white-space:normal; flex-wrap:wrap; row-gap:6px; }
+    }
+
     .sectionTitle{
       margin:0 auto 10px;
       font-size:clamp(26px, 3vw, 38px);
@@ -301,7 +338,7 @@
       font-size:16px;
     }
 
-    /* LIGHT SECTION (white background / black text) */
+    /* LIGHT SECTION */
     .layerLight{ color:#0b0c10; }
 
     .layerLight::before{
@@ -338,16 +375,11 @@
       margin-top:26px;
       display:grid;
       grid-template-columns:repeat(3, minmax(0, 1fr));
-      gap:44px; /* větší mezery mezi produkty */
+      gap:44px;
       align-items:stretch;
     }
 
-    .product{
-      text-align:center;
-      display:flex;
-      flex-direction:column;
-      gap:14px;
-    }
+    .product{ text-align:center; display:flex; flex-direction:column; gap:14px; position:relative; }
 
     .productTitle{
       margin:0;
@@ -357,17 +389,33 @@
       letter-spacing:.14em;
     }
 
-    .productMedia{ display:flex; justify-content:center; }
-
-    .productImageBtn{
-      width:100%;
-      border:0;
-      background:transparent;
-      padding:0;
-      cursor:pointer;
-      outline:none;
+    .productMini{
+      margin:6px auto 0;
+      max-width:42ch;
+      color:rgba(0,0,0,.68);
+      font-size:15px;
+      font-weight:600;
+      line-height:1.6;
     }
 
+    .productBullets{
+      margin:0 auto;
+      padding-left:18px;
+      text-align:left;
+      max-width:46ch;
+      color:rgba(0,0,0,.78);
+      font-size:15px;
+      font-weight:600;
+      line-height:1.7;
+    }
+
+    .productBullets li{ margin:4px 0; }
+
+    .productMedia{ display:flex; justify-content:center; }
+
+    .productImageBtn{ width:100%; border:0; background:transparent; padding:0; cursor:pointer; outline:none; }
+
+    /* keep @property for supported browsers; it is safe here */
     @property --glowAngle {
       syntax: "<angle>";
       inherits: false;
@@ -417,131 +465,78 @@
       filter:blur(.12px);
     }
 
-    .productImageBtn:hover .productImage{
-      transform:translateY(-2px);
-      border-color:rgba(228,149,16,.24);
-    }
+    .productImageBtn:hover .productImage{ transform:translateY(-2px); border-color:rgba(228,149,16,.24); }
 
-    .productCtaUnder{
-      margin-top:14px;
-      display:flex;
-      justify-content:center;
-    }
+    .productCtaUnder{ margin-top:14px; display:flex; justify-content:center; }
 
-    /* ========== MEZI-LAYER: PARTNEŘI (více bílé) ========== */
-    .partnersLayer{
-      padding:30px 0; /* trochu větší -> plynulejší přechod */
-      text-align:center;
-    }
+    .productPrice{ margin:8px 0 0; font-size:15px; font-weight:800; color:rgba(0,0,0,.72); }
 
-    .partnersLayer::before{
+    .productHighlight{ position:relative; }
+    .productHighlight::before{
       content:"";
       position:absolute;
-      inset:0;
-      background:
-        radial-gradient(900px 240px at 50% 42%, rgba(228,149,16,.08), transparent 72%),
-        linear-gradient(180deg, rgba(255,255,255,1), rgba(255,255,255,1));
-      z-index:0;
+      inset:-2px;
+      border-radius:24px;
+      background:linear-gradient(135deg, var(--accent), var(--accentDeep));
+      z-index:-1;
+      opacity:.18;
     }
 
-    .partnersBar{
-      position:relative;
-      z-index:2;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:14px;
+    .productHasBadge{ position:relative; }
+
+    .productBadge{
+      display:inline-block;
+      margin:0 auto 8px;
+      padding:6px 14px;
+      background:var(--accent);
+      color:rgba(0,0,0,.88);
+      font-size:11px;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      border-radius:999px;
+      white-space:nowrap;
+      box-shadow:0 8px 24px rgba(228,149,16,.25);
     }
 
-    /* Carousel / marquee (clean: only logos, no frames) */
-    .partnersMarquee{
-      width:100%;
-      overflow:hidden;
-      border:none;
-      background:transparent;
-      box-shadow:none;
-      padding:0;
+    .productBadgeAlt{
+      display:inline-block;
+      margin:0 auto 8px;
+      padding:6px 14px;
+      background:rgba(0,0,0,.75);
+      color:rgba(255,255,255,.88);
+      font-size:11px;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      border-radius:999px;
+      white-space:nowrap;
+      border:1px solid rgba(0,0,0,.15);
+      box-shadow:0 8px 24px rgba(0,0,0,.15);
     }
 
-    .partnersTrack{
-      display:flex;
-      align-items:center;
-      gap:14px;
-      width:max-content;
-      animation:partnerScroll 22s linear infinite;
-      will-change:transform;
-    }
-
-    .partnersLayer:hover .partnersTrack{ animation-play-state:paused; }
-
-    @keyframes partnerScroll{
-      from{ transform:translateX(0); }
-      to{ transform:translateX(-50%); }
-    }
-
-    /* removed partners label (carouseled only) */
-
-    .partnersRow{
-      display:flex;
-      align-items:center;
-      justify-content:flex-start;
-      gap:14px;
-      flex-wrap:nowrap;
-    }
-
-    .partnerLogo{
-      height:30px;
-      width:auto;
-      opacity:.92;
-      border:none;
-      background:transparent;
-      box-shadow:none;
-      border-radius:0;
-      filter:grayscale(0);
-      transition:opacity .18s ease, transform .18s ease;
-    }
-
-    .partnerLogo:hover{
-      opacity:1;
-      transform:translateY(-1px);
-    }
-
-    /* ========== SEKCE 3: MISE ========== */
+    /* MISE */
     #mise.layerAlt::before{
       background:
-        radial-gradient(1200px 680px at 18% 0%, rgba(228,149,16,.14), transparent 62%),
-        radial-gradient(980px 520px at 88% 10%, rgba(228,149,16,.10), transparent 60%),
-        radial-gradient(900px 520px at 50% 120%, rgba(255,255,255,.05), transparent 62%),
-        linear-gradient(180deg, rgba(11,12,16,.92), rgba(11,12,16,.985));
+        radial-gradient(1100px 600px at 18% -10%, rgba(228,149,16,.18), transparent 60%),
+        radial-gradient(900px 500px at 92% 0%, rgba(228,149,16,.12), transparent 55%),
+        radial-gradient(900px 700px at 40% 120%, rgba(255,255,255,.05), transparent 60%),
+        linear-gradient(180deg, rgba(7,8,11,1), rgba(11,12,16,1));
     }
+
+    #mise{ padding-top:48px; }
 
     #mise .sectionTitle{
       font-size:clamp(28px, 3.2vw, 38px);
       font-weight:900;
       letter-spacing:-0.03em;
-      margin-bottom: 12px;
+      margin-bottom:12px;
     }
 
-    #mise .sectionText{
-      font-size:18px;
-      max-width:92ch;
-      color:rgba(255,255,255,.72);
-    }
+    #mise .sectionText{ font-size:18px; max-width:92ch; color:rgba(255,255,255,.72); }
 
-    .missionIntro{
-      margin-top:18px;
-      max-width:94ch;
-      margin-left:auto;
-      margin-right:auto;
-    }
-
-    .missionIntro p{
-      margin:0;
-      color:rgba(255,255,255,.82);
-      line-height:1.95;
-      font-size:19px;
-      text-align:center;
-    }
+    .missionIntro{ margin-top:18px; max-width:94ch; margin-left:auto; margin-right:auto; }
+    .missionIntro p{ margin:0; color:rgba(255,255,255,.82); line-height:1.95; font-size:19px; text-align:center; }
 
     .missionRows{
       margin-top:36px;
@@ -563,7 +558,6 @@
     }
 
     .missionRow.swap{ grid-template-areas: "media text"; }
-
     .missionRow .missionCard{ grid-area:text; }
     .missionRow .missionMedia{ grid-area:media; }
 
@@ -576,27 +570,10 @@
       box-shadow:0 18px 70px rgba(0,0,0,.38);
     }
 
-    .missionCard h3{
-      margin:0 0 10px;
-      font-size:18px;
-      font-weight:900;
-      letter-spacing:-0.02em;
-    }
+    .missionCard h3{ margin:0 0 10px; font-size:18px; font-weight:900; letter-spacing:-0.02em; }
+    .missionCard p{ margin:0 0 10px; color:rgba(255,255,255,.78); line-height:1.75; font-size:16px; }
 
-    .missionCard p{
-      margin:0 0 10px;
-      color:rgba(255,255,255,.78);
-      line-height:1.75;
-      font-size:16px;
-    }
-
-    .missionCard ul{
-      margin:10px 0 10px;
-      padding-left:18px;
-      color:rgba(255,255,255,.74);
-      line-height:1.7;
-      font-size:16px;
-    }
+    .missionCard ul{ margin:10px 0 10px; padding-left:18px; color:rgba(255,255,255,.74); line-height:1.7; font-size:16px; }
 
     .missionRow .missionMedia{
       min-height:340px;
@@ -615,12 +592,7 @@
       overflow:hidden;
     }
 
-    .missionRow.swap .missionCard{
-      border-radius:0 22px 22px 0;
-      border-right:1px solid rgba(255,255,255,.10);
-      border-left:0;
-    }
-
+    .missionRow.swap .missionCard{ border-radius:0 22px 22px 0; border-right:1px solid rgba(255,255,255,.10); border-left:0; }
     .missionRow.swap .missionMedia{ border-radius:22px 0 0 22px; }
 
     .missionMediaLabel{
@@ -641,13 +613,7 @@
     }
 
     /* FAQ */
-    .faqWrap{
-      margin-top:18px;
-      max-width:920px;
-      margin-left:auto;
-      margin-right:auto;
-      text-align:left;
-    }
+    .faqWrap{ margin-top:18px; max-width:920px; margin-left:auto; margin-right:auto; text-align:left; }
 
     details.faqItem{
       border:1px solid rgba(255,255,255,.10);
@@ -658,10 +624,7 @@
       margin-bottom:12px;
     }
 
-    details.faqItem[open]{
-      border-color:rgba(255,255,255,.16);
-      background:rgba(255,255,255,.05);
-    }
+    details.faqItem[open]{ border-color:rgba(255,255,255,.16); background:rgba(255,255,255,.05); }
 
     details.faqItem summary{
       cursor:pointer;
@@ -692,12 +655,12 @@
 
     details.faqItem[open] .faqIcon{ transform:rotate(45deg); }
 
-    .faqBody{
-      margin-top:10px;
-      color:rgba(255,255,255,.70);
-      line-height:1.7;
-      font-size:14px;
-    }
+    .faqBody{ margin-top:10px; color:rgba(255,255,255,.70); line-height:1.7; font-size:14px; }
+
+    /* Contact */
+    .contactBox{ margin-top:32px; display:flex; flex-direction:column; align-items:center; gap:16px; }
+    .contactNote{ margin:0; color:rgba(255,255,255,.50); font-size:14px; font-weight:600; }
+    .btnLarge{ padding:18px 32px; font-size:16px; border-radius:18px; }
 
     /* Reveal */
     .reveal{ opacity:0; transform:translateY(10px); transition:opacity .55s ease, transform .55s ease; }
@@ -746,26 +709,10 @@
       margin-bottom:14px;
     }
 
-    .modalTitle{
-      margin:0;
-      font-size:16px;
-      font-weight:900;
-      letter-spacing:-0.01em;
-      text-transform:uppercase;
-    }
+    .modalTitle{ margin:0; font-size:16px; font-weight:900; letter-spacing:-0.01em; text-transform:uppercase; }
+    .modalPrice{ margin-top:6px; color:rgba(255,255,255,.70); font-size:14px; }
 
-    .modalPrice{
-      margin-top:6px;
-      color:rgba(255,255,255,.70);
-      font-size:14px;
-    }
-
-    .modalActions{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      flex:0 0 auto;
-    }
+    .modalActions{ display:flex; align-items:center; gap:10px; flex:0 0 auto; }
 
     .modalClose{
       border:1px solid rgba(255,255,255,.14);
@@ -784,53 +731,20 @@
     .modalClose:hover{ transform:translateY(-1px); }
     .modalClose:active{ transform:translateY(0); }
 
-    .modalBody{
-      text-align:left;
-      line-height:1.65;
-      color:rgba(255,255,255,.86);
-      padding:2px 2px 12px;
-    }
+    .modalBody{ text-align:left; line-height:1.75; color:rgba(255,255,255,.90); padding:2px 2px 12px; }
 
-    .modalBody h4{
-      margin:16px 0 6px;
-      font-size:14px;
-      text-transform:uppercase;
-      letter-spacing:.06em;
-      color:rgba(255,255,255,.76);
-    }
+    .modalBody h4{ margin:16px 0 6px; font-size:14px; text-transform:uppercase; letter-spacing:.06em; color:rgba(255,255,255,.76); }
+    .modalBody p{ margin:0 0 12px; color:rgba(255,255,255,.74); font-size:15px; }
+    .modalBody ul{ margin:8px 0 12px; padding-left:18px; color:rgba(255,255,255,.74); font-size:15px; }
 
-    .modalBody p{
-      margin:0 0 10px;
-      color:rgba(255,255,255,.72);
-      font-size:14px;
-    }
-
-    .modalBody ul{
-      margin:8px 0 10px;
-      padding-left:18px;
-      color:rgba(255,255,255,.72);
-      font-size:14px;
-    }
-
-    .modalFooter{
-      display:flex;
-      justify-content:flex-end;
-      gap:10px;
-      border-top:1px solid rgba(255,255,255,.08);
-      padding-top:14px;
-      margin-top:6px;
-    }
+    .modalFooter{ display:flex; justify-content:flex-end; gap:10px; border-top:1px solid rgba(255,255,255,.08); padding-top:14px; margin-top:6px; }
 
     @media (max-width: 920px){
       nav{ display:none; }
       .layer{ padding:70px 0 54px; }
       .heroLayer{ padding:92px 0 72px; min-height:84vh; }
       .products{ grid-template-columns:1fr; }
-
-      .partnersLayer{ padding:26px 0; }
       .partnerLogo{ height:28px; }
-      .partnersLabel{ width:100%; justify-content:center; }
-
       .missionRow{ grid-template-columns:1fr; grid-template-areas:"text" "media"; }
       .missionRow.swap{ grid-template-areas:"text" "media"; }
       .missionMedia{ min-height:220px; }
@@ -852,175 +766,188 @@
         </div>
 
         <nav aria-label="Hlavní navigace">
-          <a href="#top" title="Začátek">Start</a>
-          <a href="#modely" title="Komunita">Komunita</a>
-          <a href="#mise" title="Mise">Mise</a>
-          <a href="#faq" title="FAQ">FAQ</a>
-          <a href="#kontakt" title="Kontakt">Kontakt</a>
+          <a href="video.html" title="Video">▶ Video</a>
+          <a href="#modely" title="Členství">Členství</a>
         </nav>
-
-        <a class="ctaTop" href="#kontakt" aria-label="Bookni si hovor">
-          <span style="font-weight:900;">Bookni si hovor</span>
-          <span style="color:rgba(0,0,0,.55);font-size:13px;">→</span>
-        </a>
       </div>
     </header>
 
-    <!-- ========== SEKCE 1: HERO (full-width background image layer) ========== -->
+    <!-- HERO -->
     <main class="layer heroLayer hasBg" id="top" style="--bg-img: url('hero-bg.jpg');" aria-label="Přistávací náhled">
-      <section class="layerInner reveal">
-        <h1 class="heroH1">CHCEŠ SE NAUČIT PROMĚNIT SKILL<br>V PUBLIKUM A PŘÍLEŽITOST?</h1>
-        <p class="heroH2">Komunita pro DJs, kteří chtějí růst, být vidět a dostat se na další level.</p>
-        <div style="display:flex;justify-content:center;margin-top:18px;">
-          <a class="btn btnPrimary" id="ctaMain" href="#kontakt">Jak vám můžeme pomoci?</a>
+      <section class="layerInner reveal is-in">
+        <h1 class="heroH1">Proměň svůj skill v publikum a reálné příležitosti.</h1>
+        <p class="heroH2">Systém a komunita pro DJs, kteří nechtějí jen trénovat, ale být vidět a posunout se dál.</p>
+        <div class="heroCtas">
+          <a class="btn btnPrimary" href="video.html" id="ctaVideo">▶ Pusť si video</a>
+          <a class="btn btnGhost" href="#modely" id="ctaMembership">Zobrazit členství</a>
         </div>
       </section>
+
+      <!-- HERO BOTTOM STAT -->
+      <div class="heroBottomStat" aria-label="Rychlá metrika">
+        <span class="statText">30+ AKTIVNÍCH ČLENŮ</span>
+        <span class="sep" aria-hidden="true">•</span>
+        <span class="statText">UZAVŘENÝ VSTUP</span>
+        <span class="sep" aria-hidden="true">•</span>
+        <span class="statText">PRAVIDELNÉ VÝSTUPY</span>
+      </div>
     </main>
 
-    <!-- ========== SEKCE 2: MODELY (3 produkty vedle sebe) ========== -->
-    <section class="layer layerAlt layerLight" id="modely" aria-label="Modely">
-      <div class="layerInner reveal">
-        <h2 class="sectionTitle">VYBER SI ČLENSTVÍ KTERÉ TĚ POSUNE.</h2>
-        <p class="sectionText">ZJISTI VÍCE</p>
 
-        <div class="products" aria-label="Modely vedle sebe">
 
-          <article class="product" aria-label="Online model">
-            <h3 class="productTitle">ONLINE ACCESS</h3>
-            <div class="productMedia">
-              <button class="productImageBtn" type="button" data-model="online" aria-label="Odkryj Online Access">
-                <div class="productImage" style="--img: url('online-model.jpg');" role="img" aria-label="Online Access obrázek"></div>
-              </button>
-            </div>
-            <div class="productCtaUnder">
-              <a class="btn btnPrimary btnSmall" href="#kontakt">Vybrat Online Acess</a>
-            </div>
-          </article>
-
-          <article class="product" aria-label="Studio model">
-            <h3 class="productTitle">STUDIO ACCESS</h3>
-            <div class="productMedia">
-              <button class="productImageBtn" type="button" data-model="hybrid" aria-label="Odkryj Studio Access">
-                <div class="productImage" style="--img: url('hybrid-model.jpg');" role="img" aria-label="Studio Access obrázek"></div>
-              </button>
-            </div>
-            <div class="productCtaUnder">
-              <a class="btn btnPrimary btnSmall" href="#kontakt">Požádat o Studio Acess</a>
-            </div>
-          </article>
-
-          <article class="product" aria-label="Mentoring model">
-            <h3 class="productTitle">MENTORING ACCESS</h3>
-            <div class="productMedia">
-              <button class="productImageBtn" type="button" data-model="engine" aria-label="Odkryj Mentoring Access">
-                <div class="productImage" style="--img: url('engine-model.jpg');" role="img" aria-label="Mentoring Access obrázek"></div>
-              </button>
-            </div>
-            <div class="productCtaUnder">
-              <a class="btn btnPrimary btnSmall" href="#kontakt">Požádat o Mentoring</a>
-            </div>
-          </article>
-
-        </div>
-      </div>
-    </section>
-
-    <!-- ========== MEZI-LAYER: PARTNEŘI ========== -->
-    <section class="layer partnersLayer" id="partneri" aria-label="Partneři">
-      <div class="layerInner reveal">
-        <div class="partnersBar" aria-label="Logo carousel">
-          <div class="partnersMarquee" aria-label="Loga partnerů (carousel)">
-            <div class="partnersTrack" role="list" aria-label="Loga partnerů">
-              <!-- Set A -->
-              <div class="partnersRow" aria-hidden="false">
-                <img class="partnerLogo" role="listitem" alt="Partner 1" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='44'%3E%3Crect width='160' height='44' rx='12' fill='%23ffffff'/%3E%3Ctext x='50%25' y='56%25' text-anchor='middle' font-family='Montserrat,Arial' font-size='16' font-weight='800' fill='%23111111'%3ELOGO%201%3C/text%3E%3C/svg%3E" />
-                <img class="partnerLogo" role="listitem" alt="Partner 2" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='44'%3E%3Crect width='160' height='44' rx='12' fill='%23ffffff'/%3E%3Ctext x='50%25' y='56%25' text-anchor='middle' font-family='Montserrat,Arial' font-size='16' font-weight='800' fill='%23111111'%3ELOGO%202%3C/text%3E%3C/svg%3E" />
-                <img class="partnerLogo" role="listitem" alt="Partner 3" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='44'%3E%3Crect width='160' height='44' rx='12' fill='%23ffffff'/%3E%3Ctext x='50%25' y='56%25' text-anchor='middle' font-family='Montserrat,Arial' font-size='16' font-weight='800' fill='%23111111'%3ELOGO%203%3C/text%3E%3C/svg%3E" />
-                <img class="partnerLogo" role="listitem" alt="Partner 4" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='44'%3E%3Crect width='160' height='44' rx='12' fill='%23ffffff'/%3E%3Ctext x='50%25' y='56%25' text-anchor='middle' font-family='Montserrat,Arial' font-size='16' font-weight='800' fill='%23111111'%3ELOGO%204%3C/text%3E%3C/svg%3E" />
-                <img class="partnerLogo" role="listitem" alt="Partner 5" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='44'%3E%3Crect width='160' height='44' rx='12' fill='%23ffffff'/%3E%3Ctext x='50%25' y='56%25' text-anchor='middle' font-family='Montserrat,Arial' font-size='16' font-weight='800' fill='%23111111'%3ELOGO%205%3C/text%3E%3C/svg%3E" />
-              </div>
-
-              <!-- Set B (duplicate for seamless loop) -->
-              <div class="partnersRow" aria-hidden="true">
-                <img class="partnerLogo" alt="Partner 1" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='44'%3E%3Crect width='160' height='44' rx='12' fill='%23ffffff'/%3E%3Ctext x='50%25' y='56%25' text-anchor='middle' font-family='Montserrat,Arial' font-size='16' font-weight='800' fill='%23111111'%3ELOGO%201%3C/text%3E%3C/svg%3E" />
-                <img class="partnerLogo" alt="Partner 2" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='44'%3E%3Crect width='160' height='44' rx='12' fill='%23ffffff'/%3E%3Ctext x='50%25' y='56%25' text-anchor='middle' font-family='Montserrat,Arial' font-size='16' font-weight='800' fill='%23111111'%3ELOGO%202%3C/text%3E%3C/svg%3E" />
-                <img class="partnerLogo" alt="Partner 3" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='44'%3E%3Crect width='160' height='44' rx='12' fill='%23ffffff'/%3E%3Ctext x='50%25' y='56%25' text-anchor='middle' font-family='Montserrat,Arial' font-size='16' font-weight='800' fill='%23111111'%3ELOGO%203%3C/text%3E%3C/svg%3E" />
-                <img class="partnerLogo" alt="Partner 4" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='44'%3E%3Crect width='160' height='44' rx='12' fill='%23ffffff'/%3E%3Ctext x='50%25' y='56%25' text-anchor='middle' font-family='Montserrat,Arial' font-size='16' font-weight='800' fill='%23111111'%3ELOGO%204%3C/text%3E%3C/svg%3E" />
-                <img class="partnerLogo" alt="Partner 5" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='44'%3E%3Crect width='160' height='44' rx='12' fill='%23ffffff'/%3E%3Ctext x='50%25' y='56%25' text-anchor='middle' font-family='Montserrat,Arial' font-size='16' font-weight='800' fill='%23111111'%3ELOGO%205%3C/text%3E%3C/svg%3E" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ========== SEKCE 3: MISE ========== -->
+    <!-- MISE -->
     <section class="layer layerAlt" id="mise" aria-label="Mise">
-      <div class="layerInner reveal">
-        <h2 class="sectionTitle">MISE TALENT ROOM</h2>
-        <p class="sectionText">Talent Room není další komunita. Je to systém spolupráce, který pomáhá talentu nezůstat neviditelný.</p>
+      <div class="layerInner reveal is-in">
+        <h2 class="sectionTitle">Mise</h2>
+        <p class="sectionText">Talent Room je systém spolupráce a výstupů pro DJs, kteří chtějí publikum a reálné příležitosti.</p>
 
         <div class="missionIntro">
-          <p><strong>Česká DJ scéna není malá.</strong> Ani slabá. Ani nekvalitní. Je roztříštěná — ne proto, že by lidé neuměli hrát, ale protože chybí společný systém spolupráce.</p>
+          <p>Česká DJ kultura není malá ani slabá. Je roztříštěná. Ne proto, že by lidé neuměli hrát — ale protože chybí jedno místo, které drží standard, zrychluje výstupy a podporuje spolupráci napříč scénami.</p>
         </div>
 
         <div class="missionRows" aria-label="Mise sekce">
-
           <div class="missionRow">
             <div class="missionCard">
-              <h3>Proč Talent Room vznikl</h3>
-              <p>Každý bojuje sám. A tím se ztrácí potenciál celé scény. Talent Room vznikl jako místo, kde se sdílení stává výhodou — ne rizikem.</p>
-              <p><strong>Spolupráce</strong> místo rivality. <strong>Systém</strong> místo náhody. <strong>Růst</strong> místo přežívání.</p>
+              <h3>Proč to existuje</h3>
+              <p>Talent Room staví prostředí, kde se spolupráce stává výhodou. Ne soutěž o ego. Standard jsou výstupy.</p>
+              <ul>
+                <li>spolupráce místo rivality</li>
+                <li>systém místo náhody</li>
+                <li>výstupy místo tréninku do prázdna</li>
+              </ul>
             </div>
-            <div class="missionMedia" style="--img: url('mission-1.jpg');" aria-label="Mise obrázek 1">
+            <!-- POZN.: V každé Mission sekci počítej s tím, že místo obrázku bude vložené VIDEO (embed / player). -->
+            <div class="missionMedia" data-media="video" style="--img: url('mission-1.jpg');" aria-label="Mise obrázek 1">
               <div class="missionMediaLabel">Spolupráce</div>
             </div>
           </div>
 
           <div class="missionRow swap">
             <div class="missionCard">
-              <h3>Jak to vidíme</h3>
-              <p><strong>DJing pro nás není cíl.</strong> Je to vstupní bod. Dnes už nestačí jen „umět hrát“. Rozhodují výstupy, viditelnost a další krok — postavené na systému.</p>
+              <h3>DJing je cesta</h3>
+              <p>DJing není cíl. Je to vstupní bod k publiku, portfoliu a dalším příležitostem. Bez systému zůstane většina lidí neviditelná.</p>
               <ul>
-                <li><strong>Skill sám nestačí</strong> — změna přichází přes výstupy.</li>
-                <li><strong>Prostředí formuje výkon</strong> — systém porazí chaos.</li>
-                <li><strong>Spolupráce porazí konkurenci</strong> — roste celá scéna.</li>
+                <li>portfolio, které jde ukázat</li>
+                <li>output, který jde publikovat</li>
+                <li>další krok (bookingy, positioning)</li>
               </ul>
             </div>
-            <div class="missionMedia" style="--img: url('mission-2.jpg');" aria-label="Mise obrázek 2">
-              <div class="missionMediaLabel">Output</div>
+            <div class="missionMedia" data-media="video" style="--img: url('mission-2.jpg');" aria-label="Mise obrázek 2">
+              <div class="missionMediaLabel">Výstupy</div>
             </div>
           </div>
 
           <div class="missionRow">
             <div class="missionCard">
-              <h3>Co u nás najdeš</h3>
-              <p>Komunitu, kde si lidé pomáhají technicky i lidsky. Kde se sdílí akce napříč republikou. Kde vznikají spolupráce místo rivality.</p>
-              <p>Podporu v technice, tvorbě, contentu, organizaci akcí, marketingu — a taky v moderních nástrojích (AI & automatizace), které šetří čas a zrychlují progres.</p>
+              <h3>Multitalent bez chaosu</h3>
+              <p>Technika je dostupná. Konkurence je globální. Pozornost je měna. Rozhoduje schopnost prezentace, obsahu a systémů.</p>
+              <ul>
+                <li>content bez chaosu</li>
+                <li>pravidelnost místo nárazů</li>
+                <li>směr místo motivace</li>
+              </ul>
             </div>
-            <div class="missionMedia" style="--img: url('mission-3.jpg');" aria-label="Mise obrázek 3">
-              <div class="missionMediaLabel">Prostředí</div>
+            <div class="missionMedia" data-media="video" style="--img: url('mission-3.jpg');" aria-label="Mise obrázek 3">
+              <div class="missionMediaLabel">Systém</div>
             </div>
           </div>
 
           <div class="missionRow swap">
             <div class="missionCard">
-              <h3>Pro koho Talent Room je</h3>
-              <p>Pro DJs, producenty a kreativce, kteří chtějí růst. Kteří nehledají jen místo na trénink — ale směr, systém a prostředí, které je udrží v pohybu.</p>
-              <p><strong>Talent Room je místo, kde se talent přestává ztrácet v tichu.</strong></p>
+              <h3>Technologie i lidskost</h3>
+              <p>AI a automatizace jsou nástroje. Hudba je o lidech a emocích. Talent Room spojuje výkon se skutečným prostředím.</p>
+              <ul>
+                <li>nástroje, které šetří čas</li>
+                <li>prostředí, které drží tempo</li>
+                <li>lidi, kteří zvedají standard</li>
+              </ul>
             </div>
-            <div class="missionMedia" style="--img: url('mission-4.jpg');" aria-label="Mise obrázek 4">
-              <div class="missionMediaLabel">Směr</div>
+            <div class="missionMedia" data-media="video" style="--img: url('mission-4.jpg');" aria-label="Mise obrázek 4">
+              <div class="missionMediaLabel">Prostředí</div>
             </div>
           </div>
-
         </div>
       </div>
     </section>
 
-    <!-- ========== SEKCE 4: FAQ ========== -->
+    <!-- PRODUKTY / ČLENSTVÍ -->
+    <section class="layer layerAlt layerLight" id="modely" aria-label="Členství">
+      <div class="layerInner reveal is-in">
+        <h2 class="sectionTitle">Členství</h2>
+        <p class="sectionText">Vyber úroveň podle toho, jaký další krok chceš udělat.</p>
+
+        <div class="products" aria-label="Produkty vedle sebe">
+          <article class="product productHighlight" aria-label="Online Access">
+            <div class="productBadge">Doporučujeme</div>
+            <h3 class="productTitle">Online Access</h3>
+            <p class="productMini">Strukturovaný systém pro DJs, kteří chtějí týdenní výstupy místo náhodného tréninku.</p>
+            <ul class="productBullets">
+              <li>44denní roadmapa s jasným rytmem</li>
+              <li>Promo systém a content šablony</li>
+              <li>Měsíční exclusive edity a producer packy</li>
+              <li>Contests s deadliny</li>
+              <li>Uzavřená komunita aktivních členů</li>
+            </ul>
+            <div class="productMedia">
+              <button class="productImageBtn" type="button" data-model="online" aria-label="Otevřít detail Online Access">
+                <div class="productImage" style="--img: url('online-model.jpg');" role="img" aria-label="Online Access obrázek"></div>
+              </button>
+            </div>
+            <p class="productPrice">690 Kč / měsíc</p>
+            <div class="productCtaUnder">
+              <a class="btn btnPrimary btnSmall" href="https://example.com/stripe-online" data-cta="online">Vstoupit</a>
+            </div>
+          </article>
+
+          <article class="product productHasBadge" aria-label="Studio Access">
+            <div class="productBadgeAlt">Prostředí zrychluje</div>
+            <h3 class="productTitle">Studio Access</h3>
+            <p class="productMini">Online systém + fyzický prostor pro nahrávání setů, streamů a contentu.</p>
+            <ul class="productBullets">
+              <li>Vše z Online Access</li>
+              <li>Přístup do DJ studia s rezervačním systémem</li>
+              <li>Nahrávání v kvalitě pro publikování</li>
+              <li>Fokus bloky bez rozptylování</li>
+            </ul>
+            <div class="productMedia">
+              <button class="productImageBtn" type="button" data-model="studio" aria-label="Otevřít detail Studio Access">
+                <div class="productImage" style="--img: url('hybrid-model.jpg');" role="img" aria-label="Studio Access obrázek"></div>
+              </button>
+            </div>
+            <p class="productPrice">1 490 Kč / měsíc</p>
+            <div class="productCtaUnder">
+              <a class="btn btnPrimary btnSmall" href="#kontakt" data-cta="studio">Požádat o přístup</a>
+            </div>
+          </article>
+
+          <article class="product productHasBadge" aria-label="Mentoring Access">
+            <div class="productBadgeAlt">Limitovaná místa</div>
+            <h3 class="productTitle">Mentoring Access</h3>
+            <p class="productMini">Přímé vedení a feedback pro ty, kdo chtějí nejrychlejší posun.</p>
+            <ul class="productBullets">
+              <li>Vše z Online + Studio Access</li>
+              <li>Feedback na sety, content a směr</li>
+              <li>Pomoc s bookingama a positioningem</li>
+              <li>Priorita v systému</li>
+              <li>Limitovaný počet míst</li>
+            </ul>
+            <div class="productMedia">
+              <button class="productImageBtn" type="button" data-model="mentoring" aria-label="Otevřít detail Mentoring Access">
+                <div class="productImage" style="--img: url('engine-model.jpg');" role="img" aria-label="Mentoring Access obrázek"></div>
+              </button>
+            </div>
+            <p class="productPrice">od 3 000 Kč / měsíc</p>
+            <div class="productCtaUnder">
+              <a class="btn btnPrimary btnSmall" href="#kontakt" data-cta="mentoring">Požádat o přístup</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
     <section class="layer layerAlt" id="faq" aria-label="FAQ">
-      <div class="layerInner reveal">
+      <div class="layerInner reveal is-in">
         <h2 class="sectionTitle">FAQ</h2>
         <p class="sectionText">Rychlé odpovědi, než se přidáš.</p>
 
@@ -1030,7 +957,7 @@
               Je to kurz pro začátečníky?
               <span class="faqIcon">＋</span>
             </summary>
-            <div class="faqBody">Ne. Talent Room je pro lidi, co už mají základní skill a chtějí ho proměnit v výstupy, publikum a další krok.</div>
+            <div class="faqBody">Ne. Talent Room je pro lidi, co už mají základní skill a chtějí ho proměnit ve výstupy, publikum a další krok.</div>
           </details>
 
           <details class="faqItem">
@@ -1043,7 +970,7 @@
 
           <details class="faqItem">
             <summary>
-              Budu mít co postovat, i když nejsem „content creator“?
+              Budu mít co postovat, i když nejsem „content creator"?
               <span class="faqIcon">＋</span>
             </summary>
             <div class="faqBody">Ano. Dostaneš strukturu, šablony a tlak na výstupy. Neučíme virály. Učíme <strong>output</strong>, který buduje důvěru.</div>
@@ -1062,17 +989,22 @@
               Můžu začít Online a později přejít dál?
               <span class="faqIcon">＋</span>
             </summary>
-            <div class="faqBody">Jo. Online je základní motor. Studio zrychluje a Mentoring je pro ty, co chtějí vedení a nejrychlejší posun.</div>
+            <div class="faqBody">Ano. Online je základní motor. Studio zrychluje a Mentoring je pro ty, co chtějí vedení a nejrychlejší posun.</div>
           </details>
         </div>
       </div>
     </section>
 
-    <!-- ========== SEKCE 5: KONTAKT (placeholder) ========== -->
+    <!-- KONTAKT -->
     <section class="layer layerAlt" id="kontakt" aria-label="Kontakt">
-      <div class="layerInner reveal">
-        <h2 class="sectionTitle">Kontakt</h2>
-        <p class="sectionText">Tady bude formulář / CTA. (Zatím placeholder.)</p>
+      <div class="layerInner reveal is-in">
+        <h2 class="sectionTitle">Rezervuj si místo</h2>
+        <p class="sectionText">15minutový call. Zjistíme, jestli je Talent Room pro tebe.</p>
+        
+        <div class="contactBox">
+          <a class="btn btnPrimary btnLarge" href="https://calendly.com/talentroom" target="_blank" rel="noopener">Zarezervovat call</a>
+          <p class="contactNote">Bez závazků. Bez prodejního tlaku.</p>
+        </div>
       </div>
     </section>
 
@@ -1088,7 +1020,6 @@
         </div>
 
         <div class="modalActions">
-          <!-- CTA nahoře v prokliku na produkt -->
           <a class="btn btnPrimary btnSmall" href="#kontakt" id="modalTopCta">Získat</a>
           <button class="modalClose" type="button" id="modalClose" aria-label="Zavřít">✕</button>
         </div>
@@ -1119,20 +1050,20 @@
 
     <h4>Co přesně získáš</h4>
     <ul>
-      <li><strong>90denní roadmapu</strong> s jasnými týdenními výstupy</li>
-      <li><strong>Promo & content systém</strong>, který tě naučí být vidět bez chaosu</li>
-      <li><strong>Accountability</strong> (ne motivaci, ale tlak)</li>
+      <li><strong>3denní výzvu</strong> (rychlý start + první výstupy)</li>
+      <li><strong>44denní roadmapu</strong> + týdenní výstupy (jasný rytmus)</li>
+      <li><strong>Promo & content systém</strong> (output bez chaosu)</li>
+      <li><strong>Contests</strong> (deadliny + tlak na výstup)</li>
       <li><strong>Uzavřenou online komunitu</strong> (přístup jen pro aktivní členy)</li>
     </ul>
 
-    <h4>Měsíční DJ TOOLS DROP</h4>
+    <h4>Exclusive Music & Producer Packs</h4>
     <ul>
-      <li>edity, remixy, bootlegy</li>
-      <li>producer packy & samplery</li>
-      <li>vše připravené k okamžitému použití</li>
+      <li>exclusive tracks / edits (kurátorovaně)</li>
+      <li>producer packs & samplery (připravené k použití)</li>
     </ul>
 
-    <p><em>Neučíme tě „víc hudby“.</em><br>Učíme tě přestat být neviditelný.</p>
+    <p><em>Neučíme tě „víc hudby".</em><br>Učíme tě přestat být neviditelný.</p>
   </template>
 
   <template id="tpl-hybrid">
@@ -1205,64 +1136,83 @@
     (function(){
       'use strict';
 
+      // Prevent accidental double-init (e.g., when hot-reloading or scripts injected twice)
+      // Uses var to avoid "duplicate variable" errors.
+      if (window.__talentRoomInit) return;
+      window.__talentRoomInit = true;
+
       // Reveal on scroll
-      const trRevealEls = document.querySelectorAll('.reveal');
-      const trObserver = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
+      var trRevealEls = document.querySelectorAll('.reveal');
+      var trObserver = new IntersectionObserver(function(entries){
+        entries.forEach(function(entry){
+          if(entry.isIntersecting){
             entry.target.classList.add('is-in');
             trObserver.unobserve(entry.target);
           }
         });
       }, { threshold: 0.12 });
 
-      trRevealEls.forEach((el) => trObserver.observe(el));
+      trRevealEls.forEach(function(el){ trObserver.observe(el); });
 
-      // CTA smooth scroll
-      const trCtaMain = document.getElementById('ctaMain');
-      if (trCtaMain) {
-        trCtaMain.addEventListener('click', (e) => {
-          e.preventDefault();
-          const trTarget = document.getElementById('kontakt');
-          if (trTarget) trTarget.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Smooth scroll for Membership CTA
+      var trCtaMembership = document.getElementById('ctaMembership');
+      if (trCtaMembership) {
+        trCtaMembership.addEventListener('click', function(e){
+          var trTarget = document.getElementById('modely');
+          if (trTarget) {
+            e.preventDefault();
+            trTarget.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
         });
       }
 
-      // ===== Modal logic =====
-      const trModal = document.getElementById('modelModal');
-      const trModalClose = document.getElementById('modalClose');
-      const trModalTitle = document.getElementById('modalTitle');
-      const trModalPrice = document.getElementById('modalPrice');
-      const trModalBody = document.getElementById('modalBody');
-      const trModalCta = document.getElementById('modalCta');
-      const trModalTopCta = document.getElementById('modalTopCta');
+      // Smooth scroll for in-page header links (only anchors)
+      document.querySelectorAll('header nav a[href^="#"]').forEach(function(a){
+        a.addEventListener('click', function(e){
+          var href = a.getAttribute('href') || '';
+          var id = href.startsWith('#') ? href.slice(1) : '';
+          var el = id ? document.getElementById(id) : null;
+          if (!el) return;
+          e.preventDefault();
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      });
 
-      const TR_MODEL_META = {
+      // ===== Modal logic =====
+      var trModal = document.getElementById('modelModal');
+      var trModalClose = document.getElementById('modalClose');
+      var trModalTitle = document.getElementById('modalTitle');
+      var trModalPrice = document.getElementById('modalPrice');
+      var trModalBody = document.getElementById('modalBody');
+      var trModalCta = document.getElementById('modalCta');
+      var trModalTopCta = document.getElementById('modalTopCta');
+
+      var TR_MODEL_META = {
         online: {
-          title: 'ONLINE ACCESS',
+          title: 'Online Access',
           price: '690 Kč / měsíc',
           tpl: 'tpl-online',
-          ctaText: 'Vybrat Online Acess',
-          ctaHref: '#kontakt'
+          ctaText: 'Vstoupit do Online Access',
+          ctaHref: 'https://example.com/stripe-online'
         },
-        hybrid: {
-          title: 'STUDIO ACCESS',
+        studio: {
+          title: 'Studio Access',
           price: '1 490 Kč / měsíc',
           tpl: 'tpl-hybrid',
-          ctaText: 'Požádat o Studio Acess',
+          ctaText: 'Požádat o Studio Access',
           ctaHref: '#kontakt'
         },
-        engine: {
-          title: 'MENTORING ACCESS',
+        mentoring: {
+          title: 'Mentoring Access',
           price: 'od 3 000 Kč / měsíc (limit)',
           tpl: 'tpl-engine',
-          ctaText: 'Požádat o Mentoring',
+          ctaText: 'Požádat o Mentoring Access',
           ctaHref: '#kontakt'
         }
       };
 
       function trOpenModal(key){
-        const meta = TR_MODEL_META[key];
+        var meta = TR_MODEL_META[key];
         if(!meta || !trModal) return;
 
         trModalTitle.textContent = meta.title;
@@ -1277,7 +1227,7 @@
           trModalTopCta.setAttribute('href', meta.ctaHref);
         }
 
-        const tpl = document.getElementById(meta.tpl);
+        var tpl = document.getElementById(meta.tpl);
         trModalBody.innerHTML = '';
         if(tpl && 'content' in tpl){
           trModalBody.appendChild(tpl.content.cloneNode(true));
@@ -1295,47 +1245,47 @@
         document.body.style.overflow = '';
       }
 
-      document.querySelectorAll('.productImageBtn').forEach(btn => {
-        btn.addEventListener('click', () => trOpenModal(btn.dataset.model));
+      document.querySelectorAll('.productImageBtn').forEach(function(btn){
+        btn.addEventListener('click', function(){ trOpenModal(btn.dataset.model); });
       });
 
       if(trModalClose){ trModalClose.addEventListener('click', trCloseModal); }
 
       if(trModal){
-        trModal.addEventListener('click', (e) => {
+        trModal.addEventListener('click', function(e){
           if(e.target === trModal) trCloseModal();
         });
       }
 
-      window.addEventListener('keydown', (e) => {
+      window.addEventListener('keydown', function(e){
         if(e.key === 'Escape' && trModal && trModal.classList.contains('isOpen')) trCloseModal();
       });
 
       // ===== Product Glow (subtle) =====
-      const trGlowTargets = Array.from(document.querySelectorAll('.productImage'));
-      const trGlowCfg = { proximity: 72, inactiveZone: 0.18 };
-      let trGlowRaf = 0;
-      let trLastPointer = { x: 0, y: 0 };
+      var trGlowTargets = Array.prototype.slice.call(document.querySelectorAll('.productImage'));
+      var trGlowCfg = { proximity: 72, inactiveZone: 0.18 };
+      var trGlowRaf = 0;
+      var trLastPointer = { x: 0, y: 0 };
 
       function trUpdateGlow(){
         trGlowRaf = 0;
-        const x = trLastPointer.x;
-        const y = trLastPointer.y;
+        var x = trLastPointer.x;
+        var y = trLastPointer.y;
 
-        trGlowTargets.forEach((el) => {
-          const r = el.getBoundingClientRect();
-          const cx = r.left + r.width * 0.5;
-          const cy = r.top + r.height * 0.5;
+        trGlowTargets.forEach(function(el){
+          var r = el.getBoundingClientRect();
+          var cx = r.left + r.width * 0.5;
+          var cy = r.top + r.height * 0.5;
 
-          const dist = Math.hypot(x - cx, y - cy);
-          const inactiveRadius = 0.5 * Math.min(r.width, r.height) * trGlowCfg.inactiveZone;
+          var dist = Math.hypot(x - cx, y - cy);
+          var inactiveRadius = 0.5 * Math.min(r.width, r.height) * trGlowCfg.inactiveZone;
 
           if(dist < inactiveRadius){
             el.style.setProperty('--glowActive', '0');
             return;
           }
 
-          const isActive =
+          var isActive =
             x > r.left - trGlowCfg.proximity &&
             x < r.right + trGlowCfg.proximity &&
             y > r.top - trGlowCfg.proximity &&
@@ -1344,29 +1294,31 @@
           el.style.setProperty('--glowActive', isActive ? '1' : '0');
           if(!isActive) return;
 
-          const angle = (Math.atan2(y - cy, x - cx) * 180) / Math.PI + 90;
+          var angle = (Math.atan2(y - cy, x - cx) * 180) / Math.PI + 90;
           el.style.setProperty('--glowAngle', angle + 'deg');
         });
       }
 
-      document.addEventListener('pointermove', (e) => {
+      document.addEventListener('pointermove', function(e){
         trLastPointer = { x: e.clientX, y: e.clientY };
         if(!trGlowRaf) trGlowRaf = requestAnimationFrame(trUpdateGlow);
       }, { passive:true });
 
-      window.addEventListener('scroll', () => {
+      window.addEventListener('scroll', function(){
         if(!trGlowRaf) trGlowRaf = requestAnimationFrame(trUpdateGlow);
       }, { passive:true });
 
-      // ===== sanity checks =====
+      // ===== tests / sanity checks =====
       console.assert(document.querySelectorAll('.product').length === 3, 'Exactly 3 product cards should exist');
       console.assert(document.querySelectorAll('.productImageBtn').length === 3, 'Exactly 3 product buttons should exist');
       console.assert(!!document.getElementById('tpl-online'), 'Template tpl-online should exist');
       console.assert(!!document.getElementById('tpl-hybrid'), 'Template tpl-hybrid should exist');
       console.assert(!!document.getElementById('tpl-engine'), 'Template tpl-engine should exist');
-      console.assert(!!document.getElementById('partneri'), 'Section #partneri should exist');
       console.assert(!!document.getElementById('modelModal'), 'Modal #modelModal should exist');
       console.assert(Object.keys(TR_MODEL_META).length === 3, 'TR_MODEL_META must have 3 keys');
+      console.assert(!!document.getElementById('mise'), 'Section #mise should exist');
+      console.assert(!!document.getElementById('modely'), 'Section #modely should exist');
+      console.assert(!!window.__talentRoomInit, 'Init guard should be set');
     })();
   </script>
 </body>
