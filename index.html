@@ -6,751 +6,937 @@
   <title>Talent Room — komunita pro DJs</title>
   <meta name="description" content="Talent Room je komunita pro DJs, kteří chtějí být vidět, růst a posunout se dál." />
 
-  <!-- Font: Montserrat -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
-    :root{
-      --bg:#0b0c10;
-      --bg2:#07080b;
-      --text:rgba(255,255,255,.92);
-      --muted:rgba(255,255,255,.68);
-      --line:rgba(255,255,255,.10);
-
-      /* BRAND GOLD */
-      --accent:#E49510;
-      --accentDeep:#D87500;
-
-      --shadow:0 18px 60px rgba(0,0,0,.55);
-      --radius:22px;
-      --max:1120px;
+    :root {
+      --bg: #0a0a0a;
+      --bg2: #050505;
+      --text: rgba(255, 255, 255, 0.94);
+      --text-muted: rgba(255, 255, 255, 0.78);
+      --text-subtle: rgba(255, 255, 255, 0.62);
+      --line: rgba(255, 255, 255, 0.1);
+      --accent: #D4A039;
+      --accentDeep: #B8872E;
+      --accentLight: #E8B94A;
+      --shadow: 0 18px 60px rgba(0, 0, 0, 0.6);
+      --radius: 22px;
+      --max: 1120px;
+      
+      /* Font weights - hierarchie */
+      --weight-black: 900;
+      --weight-bold: 700;
+      --weight-semibold: 600;
+      --weight-medium: 500;
+      --weight-regular: 400;
     }
 
-    *{ box-sizing:border-box; }
+    * { box-sizing: border-box; }
 
-    html,body{
-      margin:0;
-      font-family:"Montserrat", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Helvetica, Arial;
-      background:
-        radial-gradient(1100px 600px at 18% -10%, rgba(228,149,16,.18), transparent 60%),
-        radial-gradient(900px 500px at 92% 0%, rgba(228,149,16,.12), transparent 55%),
-        radial-gradient(900px 700px at 40% 120%, rgba(255,255,255,.05), transparent 60%),
+    html, body {
+      margin: 0;
+      font-family: "Montserrat", ui-sans-serif, system-ui, -apple-system, sans-serif;
+      background: 
+        radial-gradient(1100px 600px at 18% -10%, rgba(212, 160, 57, 0.12), transparent 60%),
+        radial-gradient(900px 500px at 92% 0%, rgba(212, 160, 57, 0.08), transparent 55%),
         linear-gradient(180deg, var(--bg2), var(--bg));
-      color:var(--text);
-      overflow-x:hidden;
+      color: var(--text);
+      overflow-x: hidden;
+      min-height: 100vh;
     }
 
-    a{ color:inherit; text-decoration:none; }
+    a { color: inherit; text-decoration: none; }
 
-    /* subtle noise overlay */
-    .noise::before{
-      content:"";
-      position:fixed;
-      inset:0;
-      pointer-events:none;
-      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.22'/%3E%3C/svg%3E");
-      opacity:.05;
-      mix-blend-mode:overlay;
+    .noise::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.22'/%3E%3C/svg%3E");
+      opacity: 0.05;
+      mix-blend-mode: overlay;
     }
 
-    .page{ width:100%; }
-
-    .container{
-      max-width:var(--max);
-      margin:0 auto;
-      padding:0 18px;
-    }
-
-    .layerInner{
-      position:relative;
-      z-index:2;
-      width:min(var(--max), calc(100% - 36px));
-      margin:0 auto;
-    }
+    .page { width: 100%; }
+    .container { max-width: var(--max); margin: 0 auto; padding: 0 18px; }
+    .layerInner { position: relative; z-index: 2; width: min(var(--max), calc(100% - 36px)); margin: 0 auto; }
 
     /* Header */
-    header{
-      position:sticky;
-      top:0;
-      z-index:30;
-      backdrop-filter:blur(14px);
-      -webkit-backdrop-filter:blur(14px);
-      background:var(--accent);
-      border-bottom:1px solid rgba(0,0,0,.10);
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      background: rgba(0, 0, 0, 0.9);
+      border-bottom: 1px solid rgba(212, 160, 57, 0.2);
     }
 
-    .headerInner{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding:12px 0;
-      gap:14px;
+    .headerInner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+      gap: 14px;
     }
 
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      font-weight:900;
-      letter-spacing:.12em;
-      white-space:nowrap;
-      text-transform:uppercase;
-      color:rgba(0,0,0,.92);
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      white-space: nowrap;
+      text-transform: uppercase;
+      color: #fff;
     }
 
-    .logo{
-      width:38px;
-      height:38px;
-      border-radius:14px;
-      background:
-        radial-gradient(circle at 30% 30%, rgba(255,255,255,.55), transparent 60%),
-        linear-gradient(135deg, rgba(255,255,255,.22), rgba(0,0,0,.10)),
-        linear-gradient(135deg, rgba(228,149,16,1), rgba(255,255,255,.22));
-      box-shadow:0 14px 35px rgba(0,0,0,.18);
-      border:1px solid rgba(0,0,0,.14);
-      position:relative;
-      overflow:hidden;
+    .logo {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: #000;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(212, 160, 57, 0.3);
+      position: relative;
+      overflow: hidden;
     }
 
-    .logo::after{
-      content:"TR";
-      position:absolute;
-      inset:0;
-      display:grid;
-      place-items:center;
-      font-weight:900;
-      letter-spacing:.08em;
-      color:rgba(0,0,0,.72);
-      font-size:13px;
+    .logo::after {
+      content: "TR";
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      font-size: 12px;
     }
 
-    nav{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      color:rgba(0,0,0,.78);
-      font-size:13px;
-      font-weight:900;
-      letter-spacing:.06em;
-      text-transform:uppercase;
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
     }
 
-    nav a{
-      padding:10px 12px;
-      border-radius:14px;
-      border:1px solid rgba(0,0,0,.14);
-      background:rgba(255,255,255,.22);
-      box-shadow:0 10px 30px rgba(0,0,0,.10);
-      transition:background .18s ease, transform .18s ease, border-color .18s ease, color .18s ease;
+    nav a {
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(212, 160, 57, 0.25);
+      background: rgba(212, 160, 57, 0.08);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      transition: all 0.18s ease;
     }
 
-    nav a:hover{
-      background:rgba(255,255,255,.34);
-      border-color:rgba(0,0,0,.22);
-      color:rgba(0,0,0,.92);
-      transform:translateY(-1px);
+    nav a:hover {
+      background: rgba(212, 160, 57, 0.15);
+      border-color: rgba(212, 160, 57, 0.4);
+      color: #fff;
+      transform: translateY(-1px);
     }
-
-    nav a:active{ transform:translateY(0); }
 
     /* Buttons */
-    .btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      padding:14px 18px;
-      border-radius:16px;
-      font-weight:800;
-      letter-spacing:.2px;
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(255,255,255,.06);
-      color:var(--text);
-      transition:transform .2s ease, border-color .2s ease, box-shadow .2s ease, background .2s ease;
-      cursor:pointer;
-      user-select:none;
-      box-shadow:0 10px 40px rgba(0,0,0,.30);
-      white-space:nowrap;
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 16px 24px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: 0.01em;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+      transition: all 0.2s ease;
+      cursor: pointer;
+      user-select: none;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+      white-space: nowrap;
     }
 
-    .btn:hover{ transform:translateY(-1px); }
-    .btn:active{ transform:translateY(0); }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4); }
+    .btn:active { transform: translateY(0); }
 
-    .btnPrimary{
-      border-color:rgba(228,149,16,.55);
-      background:var(--accent);
-      color:rgba(0,0,0,.92);
-      box-shadow:0 16px 55px rgba(228,149,16,.18);
+    .btnPrimary {
+      border-color: rgba(212, 160, 57, 0.6);
+      background: var(--accent);
+      color: #000;
+      font-weight: 800;
+      box-shadow: 0 12px 40px rgba(212, 160, 57, 0.25);
     }
 
-    .btnPrimary:active{
-      background:var(--accentDeep);
-      border-color:rgba(216,117,0,.75);
-      box-shadow:0 16px 55px rgba(216,117,0,.22);
+    .btnPrimary:hover {
+      background: var(--accentLight);
+      box-shadow: 0 16px 50px rgba(212, 160, 57, 0.3);
     }
 
-    .btnGhost{
-      border-color:rgba(255,255,255,.22);
-      background:rgba(0,0,0,.18);
-      color:rgba(255,255,255,.92);
-      box-shadow:0 10px 40px rgba(0,0,0,.26);
+    .btnGhost {
+      border: 2px solid var(--accent);
+      background: rgba(0, 0, 0, 0.5);
+      color: #fff;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
     }
 
-    .btnGhost:hover{
-      background:rgba(0,0,0,.22);
-      border-color:rgba(228,149,16,.38);
+    .btnGhost:hover {
+      background: rgba(212, 160, 57, 0.12);
+      border-color: var(--accentLight);
+      box-shadow: 0 12px 40px rgba(212, 160, 57, 0.15);
     }
 
-    .btnGhost:active{
-      background:rgba(0,0,0,.26);
-      border-color:rgba(216,117,0,.42);
-    }
-
-    .btnSmall{ padding:12px 14px; border-radius:14px; font-size:14px; }
+    .btnSmall { padding: 14px 20px; border-radius: 10px; font-size: 14px; }
+    .btnLarge { padding: 22px 40px; font-size: 17px; border-radius: 14px; font-weight: 800; }
 
     /* Sections */
-    .layer{
-      position:relative;
-      width:100%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      text-align:center;
-      overflow:hidden;
-      padding:86px 0 64px;
+    .layer {
+      position: relative;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      overflow: hidden;
+      padding: 86px 0 64px;
     }
 
-    .layer::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:
-        linear-gradient(180deg, rgba(11,12,16,.20), rgba(11,12,16,.92)),
-        radial-gradient(1000px 520px at 50% 10%, rgba(228,149,16,.16), transparent 60%);
-      z-index:0;
+    .layer::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(10, 10, 10, 0.2), rgba(10, 10, 10, 0.92)),
+        radial-gradient(1000px 520px at 50% 10%, rgba(212, 160, 57, 0.1), transparent 60%);
+      z-index: 0;
     }
 
-    .layerAlt::before{
-      background:
-        radial-gradient(1100px 620px at 20% 0%, rgba(255,255,255,.05), transparent 60%),
-        radial-gradient(1000px 520px at 85% 15%, rgba(228,149,16,.10), transparent 62%),
-        linear-gradient(180deg, rgba(11,12,16,.92), rgba(11,12,16,.98));
+    .layerAlt::before {
+      background: radial-gradient(1100px 620px at 20% 0%, rgba(255, 255, 255, 0.03), transparent 60%),
+        radial-gradient(1000px 520px at 85% 15%, rgba(212, 160, 57, 0.08), transparent 62%),
+        linear-gradient(180deg, rgba(10, 10, 10, 0.92), rgba(10, 10, 10, 0.98));
     }
 
-    .hasBg::after{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:
-        linear-gradient(180deg, rgba(11,12,16,.18), rgba(11,12,16,.92)),
-        radial-gradient(900px 520px at 50% 0%, rgba(228,149,16,.18), transparent 62%),
+    .hasBg::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(10, 10, 10, 0.18), rgba(10, 10, 10, 0.92)),
+        radial-gradient(900px 520px at 50% 0%, rgba(212, 160, 57, 0.12), transparent 62%),
         var(--bg-img);
-      background-size:cover;
-      background-position:center;
-      transform:translateZ(0);
-      z-index:0;
+      background-size: cover;
+      background-position: center;
+      z-index: 0;
     }
 
-    .heroLayer{ min-height:80vh; padding:72px 0 54px; }
+    .heroLayer { min-height: 80vh; padding: 72px 0 54px; }
 
-    .heroCtas{
-      display:flex;
-      justify-content:center;
-      gap:12px;
-      margin-top:28px;
-      flex-wrap:wrap;
+    .heroCtas {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 28px;
+      flex-wrap: wrap;
     }
 
-    .heroH1{
-      margin:0 auto 12px;
-      max-width:28ch;
-      font-weight:900;
-      text-transform:uppercase;
-      letter-spacing:-0.02em;
-      line-height:1.06;
-      font-size:clamp(30px, 4.2vw, 50px);
-      color:rgba(255,255,255,.96);
-      text-shadow:0 18px 60px rgba(0,0,0,.55);
+    .heroH1 {
+      margin: 0 auto 16px;
+      max-width: 20ch;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      font-size: clamp(36px, 5.5vw, 64px);
+      color: #fff;
+      text-shadow: 0 18px 60px rgba(0, 0, 0, 0.55);
     }
 
-    .heroH2{
-      margin:0 auto;
-      max-width:92ch;
-      color:rgba(255,255,255,.80);
-      font-size:clamp(14px, 1.25vw, 16px);
-      line-height:1.55;
+    .heroH2 {
+      margin: 0 auto;
+      max-width: 52ch;
+      color: var(--text-muted);
+      font-size: clamp(16px, 1.6vw, 20px);
+      font-weight: 500;
+      line-height: 1.6;
     }
 
-    @media (min-width: 980px){
-      .heroH2{ white-space:nowrap; }
+    .heroBottomStat {
+      position: absolute;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      font-size: clamp(12px, 1.2vw, 14px);
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      z-index: 10;
     }
 
-    /* HERO bottom stat */
-    .heroBottomStat{
-      position:absolute;
-      left:50%;
-      bottom:18px;
-      transform:translateX(-50%);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:12px;
-      font-size:clamp(13px, 1.3vw, 15px);
-      font-weight:900;
-      letter-spacing:.12em;
-      text-transform:uppercase;
-      white-space:nowrap;
-      z-index:10;
+    .heroBottomStat .sep {
+      color: var(--accent);
+      font-weight: 700;
+      text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8);
     }
 
-    .heroBottomStat .sep{
-      color:var(--accent);
-      font-weight:900;
-      letter-spacing:0;
-      text-shadow:0 2px 12px rgba(0,0,0,.8);
+    .heroBottomStat .statText {
+      color: rgba(255, 255, 255, 0.85);
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9), 0 4px 24px rgba(0, 0, 0, 0.7);
     }
 
-    .heroBottomStat .statText{
-      color:#fff;
-      text-shadow:0 2px 8px rgba(0,0,0,.9), 0 4px 24px rgba(0,0,0,.7), 0 0 40px rgba(0,0,0,.5);
+    .sectionTitle {
+      margin: 0 auto 12px;
+      font-size: clamp(28px, 3.5vw, 44px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #fff;
     }
 
-    @media (max-width: 920px){
-      .heroBottomStat{ white-space:normal; flex-wrap:wrap; row-gap:6px; }
+    .sectionText {
+      margin: 0 auto;
+      max-width: 60ch;
+      color: var(--text-muted);
+      line-height: 1.7;
+      font-size: 17px;
+      font-weight: 400;
     }
 
-    .sectionTitle{
-      margin:0 auto 10px;
-      font-size:clamp(26px, 3vw, 38px);
-      font-weight:900;
-      letter-spacing:-0.03em;
+    /* Light Section */
+    .layerLight { color: #0a0a0a; }
+
+    .layerLight::before {
+      background: radial-gradient(1100px 640px at 20% 0%, rgba(212, 160, 57, 0.06), transparent 62%),
+        radial-gradient(900px 520px at 90% 10%, rgba(0, 0, 0, 0.03), transparent 60%),
+        linear-gradient(180deg, #fafafa, #f5f5f5);
     }
 
-    .sectionText{
-      margin:0 auto;
-      max-width:84ch;
-      color:rgba(255,255,255,.70);
-      line-height:1.75;
-      font-size:16px;
+    .layerLight .sectionTitle { color: rgba(0, 0, 0, 0.92); }
+    .layerLight .sectionText { color: rgba(0, 0, 0, 0.7); }
+    .layerLight .productTitle { color: rgba(0, 0, 0, 0.9); }
+
+    .layerLight .btn {
+      border-color: rgba(0, 0, 0, 0.1);
+      background: rgba(0, 0, 0, 0.03);
+      color: rgba(0, 0, 0, 0.85);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     }
 
-    /* LIGHT SECTION */
-    .layerLight{ color:#0b0c10; }
-
-    .layerLight::before{
-      background:
-        radial-gradient(1100px 640px at 20% 0%, rgba(228,149,16,.08), transparent 62%),
-        radial-gradient(900px 520px at 90% 10%, rgba(0,0,0,.04), transparent 60%),
-        linear-gradient(180deg, rgba(255,255,255,1), rgba(255,255,255,1));
+    .layerLight .btnPrimary {
+      background: var(--accent);
+      border-color: rgba(212, 160, 57, 0.6);
+      color: #000;
+      box-shadow: 0 12px 40px rgba(212, 160, 57, 0.2);
     }
 
-    .layerLight .sectionTitle{ color:rgba(0,0,0,.92); }
-    .layerLight .sectionText{ color:rgba(0,0,0,.62); }
-    .layerLight .productTitle{ color:rgba(0,0,0,.90); }
-
-    .layerLight .btn{
-      border-color:rgba(0,0,0,.12);
-      background:rgba(0,0,0,.04);
-      color:rgba(0,0,0,.88);
-      box-shadow:0 10px 40px rgba(0,0,0,.12);
+    /* Products */
+    .products {
+      margin-top: 26px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 44px;
+      align-items: stretch;
     }
 
-    .layerLight .btn:hover{ background:rgba(0,0,0,.05); }
-
-    .layerLight .btnPrimary{
-      background:var(--accent);
-      border-color:rgba(228,149,16,.65);
-      color:rgba(0,0,0,.92);
-      box-shadow:0 14px 50px rgba(228,149,16,.18);
+    .product {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      position: relative;
     }
 
-    .layerLight .btnPrimary:active{ background:var(--accentDeep); }
-
-    /* PRODUCTS */
-    .products{
-      margin-top:26px;
-      display:grid;
-      grid-template-columns:repeat(3, minmax(0, 1fr));
-      gap:44px;
-      align-items:stretch;
+    .productTitle {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
     }
 
-    .product{ text-align:center; display:flex; flex-direction:column; gap:14px; position:relative; }
-
-    .productTitle{
-      margin:0;
-      font-size:14px;
-      font-weight:900;
-      text-transform:uppercase;
-      letter-spacing:.14em;
+    .productMini {
+      margin: 8px auto 0;
+      max-width: 38ch;
+      color: rgba(0, 0, 0, 0.7);
+      font-size: 15px;
+      font-weight: 400;
+      line-height: 1.6;
     }
 
-    .productMini{
-      margin:6px auto 0;
-      max-width:42ch;
-      color:rgba(0,0,0,.68);
-      font-size:15px;
-      font-weight:600;
-      line-height:1.6;
+    .productBullets {
+      margin: 0 auto;
+      padding-left: 18px;
+      text-align: left;
+      max-width: 46ch;
+      color: rgba(0, 0, 0, 0.75);
+      font-size: 15px;
+      font-weight: 500;
+      line-height: 1.7;
     }
 
-    .productBullets{
-      margin:0 auto;
-      padding-left:18px;
-      text-align:left;
-      max-width:46ch;
-      color:rgba(0,0,0,.78);
-      font-size:15px;
-      font-weight:600;
-      line-height:1.7;
+    .productBullets li { margin: 4px 0; }
+
+    .productMedia { display: flex; justify-content: center; }
+
+    .productImageBtn {
+      width: 100%;
+      border: 0;
+      background: transparent;
+      padding: 0;
+      cursor: pointer;
+      outline: none;
     }
 
-    .productBullets li{ margin:4px 0; }
-
-    .productMedia{ display:flex; justify-content:center; }
-
-    .productImageBtn{ width:100%; border:0; background:transparent; padding:0; cursor:pointer; outline:none; }
-
-    /* keep @property for supported browsers; it is safe here */
-    @property --glowAngle {
-      syntax: "<angle>";
-      inherits: false;
-      initial-value: 0deg;
-    }
-
-    .productImage{
-      --glowActive: 0;
-      width:100%;
+    .productImage {
+      width: 100%;
       aspect-ratio: 4 / 3;
-      border-radius:22px;
-      border:1px solid rgba(0,0,0,.10);
-      background:
-        linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,.02)),
-        radial-gradient(720px 380px at 18% 10%, rgba(228,149,16,.14), transparent 62%),
-        radial-gradient(720px 380px at 88% 0%, rgba(228,149,16,.10), transparent 60%),
-        var(--img);
-      background-size:cover;
-      background-position:center;
-      box-shadow:0 18px 60px rgba(0,0,0,.10);
-      position:relative;
-      overflow:hidden;
-      transform:translateY(0);
-      transition:transform .2s ease, border-color .2s ease;
+      border-radius: 18px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.02)),
+        radial-gradient(720px 380px at 18% 10%, rgba(212, 160, 57, 0.1), transparent 62%),
+        radial-gradient(720px 380px at 88% 0%, rgba(212, 160, 57, 0.08), transparent 60%),
+        #1a1a1a;
+      background-size: cover;
+      background-position: center;
+      box-shadow: 0 18px 60px rgba(0, 0, 0, 0.1);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s ease, border-color 0.2s ease;
     }
 
-    .productImage::after{
-      content:"";
-      position:absolute;
-      inset:-2px;
-      border-radius:inherit;
-      pointer-events:none;
-      opacity:calc(var(--glowActive) * .95);
-      transition:opacity .18s ease;
-      border:2px solid transparent;
-      background:
-        linear-gradient(transparent, transparent) padding-box,
-        conic-gradient(
-          from var(--glowAngle),
-          rgba(228,149,16,0) 0deg,
-          rgba(228,149,16,.90) 65deg,
-          rgba(228,149,16,.60) 140deg,
-          rgba(216,117,0,.55) 220deg,
-          rgba(228,149,16,.68) 290deg,
-          rgba(228,149,16,0) 360deg
-        ) border-box;
-      filter:blur(.12px);
+    .productImageBtn:hover .productImage {
+      transform: translateY(-2px);
+      border-color: rgba(212, 160, 57, 0.25);
     }
 
-    .productImageBtn:hover .productImage{ transform:translateY(-2px); border-color:rgba(228,149,16,.24); }
+    .productCtaUnder { margin-top: 14px; display: flex; justify-content: center; }
 
-    .productCtaUnder{ margin-top:14px; display:flex; justify-content:center; }
-
-    .productPrice{ margin:8px 0 0; font-size:15px; font-weight:800; color:rgba(0,0,0,.72); }
-
-    .productHighlight{ position:relative; }
-    .productHighlight::before{
-      content:"";
-      position:absolute;
-      inset:-2px;
-      border-radius:24px;
-      background:linear-gradient(135deg, var(--accent), var(--accentDeep));
-      z-index:-1;
-      opacity:.18;
+    .productPrice {
+      margin: 8px 0 0;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--accentDeep);
     }
 
-    .productHasBadge{ position:relative; }
+    .productHighlight { position: relative; }
 
-    .productBadge{
-      display:inline-block;
-      margin:0 auto 8px;
-      padding:6px 14px;
-      background:var(--accent);
-      color:rgba(0,0,0,.88);
-      font-size:11px;
-      font-weight:900;
-      text-transform:uppercase;
-      letter-spacing:.08em;
-      border-radius:999px;
-      white-space:nowrap;
-      box-shadow:0 8px 24px rgba(228,149,16,.25);
+    .productHighlight::before {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, var(--accent), var(--accentDeep));
+      z-index: -1;
+      opacity: 0.12;
     }
 
-    .productBadgeAlt{
-      display:inline-block;
-      margin:0 auto 8px;
-      padding:6px 14px;
-      background:rgba(0,0,0,.75);
-      color:rgba(255,255,255,.88);
-      font-size:11px;
-      font-weight:900;
-      text-transform:uppercase;
-      letter-spacing:.08em;
-      border-radius:999px;
-      white-space:nowrap;
-      border:1px solid rgba(0,0,0,.15);
-      box-shadow:0 8px 24px rgba(0,0,0,.15);
+    .productBadge {
+      display: inline-block;
+      margin: 0 auto 10px;
+      padding: 8px 16px;
+      background: var(--accent);
+      color: #000;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border-radius: 999px;
+      box-shadow: 0 6px 20px rgba(212, 160, 57, 0.25);
     }
 
-    /* MISE */
-    #mise.layerAlt::before{
-      background:
-        radial-gradient(1100px 600px at 18% -10%, rgba(228,149,16,.18), transparent 60%),
-        radial-gradient(900px 500px at 92% 0%, rgba(228,149,16,.12), transparent 55%),
-        radial-gradient(900px 700px at 40% 120%, rgba(255,255,255,.05), transparent 60%),
-        linear-gradient(180deg, rgba(7,8,11,1), rgba(11,12,16,1));
+    .productBadgeAlt {
+      display: inline-block;
+      margin: 0 auto 10px;
+      padding: 8px 16px;
+      background: rgba(20, 20, 20, 0.9);
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border-radius: 999px;
+      border: 1px solid rgba(212, 160, 57, 0.25);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
     }
 
-    #mise{ padding-top:48px; }
-
-    #mise .sectionTitle{
-      font-size:clamp(28px, 3.2vw, 38px);
-      font-weight:900;
-      letter-spacing:-0.03em;
-      margin-bottom:12px;
+    /* Mise */
+    #mise.layerAlt::before {
+      background: radial-gradient(1100px 600px at 18% -10%, rgba(212, 160, 57, 0.1), transparent 60%),
+        radial-gradient(900px 500px at 92% 0%, rgba(212, 160, 57, 0.08), transparent 55%),
+        linear-gradient(180deg, rgba(5, 5, 5, 1), rgba(10, 10, 10, 1));
     }
 
-    #mise .sectionText{ font-size:18px; max-width:92ch; color:rgba(255,255,255,.72); }
+    #mise { padding-top: 48px; }
 
-    .missionIntro{ margin-top:18px; max-width:94ch; margin-left:auto; margin-right:auto; }
-    .missionIntro p{ margin:0; color:rgba(255,255,255,.82); line-height:1.95; font-size:19px; text-align:center; }
-
-    .missionRows{
-      margin-top:36px;
-      display:flex;
-      flex-direction:column;
-      gap:26px;
-      max-width:1120px;
-      margin-left:auto;
-      margin-right:auto;
-      text-align:left;
+    #mise .sectionTitle {
+      font-size: clamp(28px, 3.5vw, 44px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
     }
 
-    .missionRow{
-      display:grid;
+    #mise .sectionText {
+      font-size: 17px;
+      max-width: 60ch;
+      color: var(--text-muted);
+    }
+
+    .missionIntro {
+      margin-top: 24px;
+      max-width: 70ch;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .missionIntro p {
+      margin: 0;
+      color: var(--text-muted);
+      line-height: 1.8;
+      font-size: 18px;
+      font-weight: 400;
+      text-align: center;
+    }
+
+    .missionRows {
+      margin-top: 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 26px;
+      max-width: 1120px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: left;
+    }
+
+    .missionRow {
+      display: grid;
       grid-template-columns: 1fr 1fr;
       grid-template-areas: "text media";
-      gap:0;
-      align-items:stretch;
+      gap: 0;
+      align-items: stretch;
     }
 
-    .missionRow.swap{ grid-template-areas: "media text"; }
-    .missionRow .missionCard{ grid-area:text; }
-    .missionRow .missionMedia{ grid-area:media; }
+    .missionRow.swap { grid-template-areas: "media text"; }
+    .missionRow .missionCard { grid-area: text; }
+    .missionRow .missionMedia { grid-area: media; }
 
-    .missionCard{
-      padding:28px 28px;
-      background:rgba(255,255,255,.04);
-      border:1px solid rgba(255,255,255,.10);
-      border-right:0;
-      border-radius:22px 0 0 22px;
-      box-shadow:0 18px 70px rgba(0,0,0,.38);
+    .missionCard {
+      padding: 28px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-right: 0;
+      border-radius: 22px 0 0 22px;
+      box-shadow: 0 18px 70px rgba(0, 0, 0, 0.38);
     }
 
-    .missionCard h3{ margin:0 0 10px; font-size:18px; font-weight:900; letter-spacing:-0.02em; }
-    .missionCard p{ margin:0 0 10px; color:rgba(255,255,255,.78); line-height:1.75; font-size:16px; }
-
-    .missionCard ul{ margin:10px 0 10px; padding-left:18px; color:rgba(255,255,255,.74); line-height:1.7; font-size:16px; }
-
-    .missionRow .missionMedia{
-      min-height:340px;
-      position:relative;
-      border:1px solid rgba(255,255,255,.10);
-      border-radius:0 22px 22px 0;
-      background:
-        linear-gradient(180deg, rgba(11,12,16,.14), rgba(11,12,16,.90)),
-        radial-gradient(700px 340px at 18% 10%, rgba(228,149,16,.16), transparent 60%),
-        radial-gradient(700px 340px at 88% 0%, rgba(228,149,16,.12), transparent 60%),
-        var(--img);
-      background-size:cover;
-      background-position:center;
-      transform:translateZ(0);
-      box-shadow:0 18px 70px rgba(0,0,0,.38);
-      overflow:hidden;
+    .missionCard h3 {
+      margin: 0 0 12px;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: #fff;
     }
 
-    .missionRow.swap .missionCard{ border-radius:0 22px 22px 0; border-right:1px solid rgba(255,255,255,.10); border-left:0; }
-    .missionRow.swap .missionMedia{ border-radius:22px 0 0 22px; }
+    .missionCard p {
+      margin: 0 0 12px;
+      color: var(--text-muted);
+      line-height: 1.7;
+      font-size: 15px;
+      font-weight: 400;
+    }
 
-    .missionMediaLabel{
-      position:absolute;
-      left:14px;
-      bottom:14px;
-      z-index:2;
-      padding:10px 12px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(0,0,0,.38);
-      color:rgba(255,255,255,.85);
-      font-size:12px;
-      font-weight:800;
-      letter-spacing:.02em;
-      backdrop-filter:blur(12px);
-      -webkit-backdrop-filter:blur(12px);
+    .missionCard ul {
+      margin: 12px 0;
+      padding-left: 18px;
+      color: var(--text-muted);
+      line-height: 1.7;
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .missionRow .missionMedia {
+      min-height: 340px;
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 0 22px 22px 0;
+      background: linear-gradient(180deg, rgba(10, 10, 10, 0.14), rgba(10, 10, 10, 0.9)),
+        radial-gradient(700px 340px at 18% 10%, rgba(212, 160, 57, 0.12), transparent 60%),
+        radial-gradient(700px 340px at 88% 0%, rgba(212, 160, 57, 0.1), transparent 60%),
+        #111;
+      background-size: cover;
+      background-position: center;
+      box-shadow: 0 18px 70px rgba(0, 0, 0, 0.38);
+      overflow: hidden;
+    }
+
+    .missionRow.swap .missionCard {
+      border-radius: 0 22px 22px 0;
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      border-left: 0;
+    }
+
+    .missionRow.swap .missionMedia { border-radius: 22px 0 0 22px; }
+
+    .missionMediaLabel {
+      position: absolute;
+      left: 14px;
+      bottom: 14px;
+      z-index: 2;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(0, 0, 0, 0.38);
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      backdrop-filter: blur(12px);
     }
 
     /* FAQ */
-    .faqWrap{ margin-top:18px; max-width:920px; margin-left:auto; margin-right:auto; text-align:left; }
-
-    details.faqItem{
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(255,255,255,.04);
-      border-radius:18px;
-      padding:14px 16px;
-      box-shadow:0 18px 60px rgba(0,0,0,.30);
-      margin-bottom:12px;
+    .faqWrap {
+      margin-top: 18px;
+      max-width: 920px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: left;
     }
 
-    details.faqItem[open]{ border-color:rgba(255,255,255,.16); background:rgba(255,255,255,.05); }
-
-    details.faqItem summary{
-      cursor:pointer;
-      list-style:none;
-      font-weight:900;
-      letter-spacing:-0.01em;
-      color:rgba(255,255,255,.88);
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
+    details.faqItem {
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 18px;
+      padding: 14px 16px;
+      box-shadow: 0 18px 60px rgba(0, 0, 0, 0.3);
+      margin-bottom: 12px;
     }
 
-    details.faqItem summary::-webkit-details-marker{ display:none; }
-
-    .faqIcon{
-      width:34px;
-      height:34px;
-      border-radius:12px;
-      display:grid;
-      place-items:center;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(0,0,0,.18);
-      color:rgba(255,255,255,.65);
-      flex:0 0 auto;
-      transition:transform .2s ease;
+    details.faqItem[open] {
+      border-color: rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.05);
     }
 
-    details.faqItem[open] .faqIcon{ transform:rotate(45deg); }
+    details.faqItem summary {
+      cursor: pointer;
+      list-style: none;
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: -0.01em;
+      color: rgba(255, 255, 255, 0.92);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
 
-    .faqBody{ margin-top:10px; color:rgba(255,255,255,.70); line-height:1.7; font-size:14px; }
+    details.faqItem summary::-webkit-details-marker { display: none; }
+
+    .faqIcon {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(0, 0, 0, 0.18);
+      color: rgba(255, 255, 255, 0.65);
+      flex: 0 0 auto;
+      transition: transform 0.2s ease;
+    }
+
+    details.faqItem[open] .faqIcon { transform: rotate(45deg); }
+
+    .faqBody {
+      margin-top: 12px;
+      color: var(--text-muted);
+      line-height: 1.7;
+      font-size: 15px;
+      font-weight: 400;
+    }
 
     /* Contact */
-    .contactBox{ margin-top:32px; display:flex; flex-direction:column; align-items:center; gap:16px; }
-    .contactNote{ margin:0; color:rgba(255,255,255,.50); font-size:14px; font-weight:600; }
-    .btnLarge{ padding:18px 32px; font-size:16px; border-radius:18px; }
-
-    /* Reveal */
-    .reveal{ opacity:0; transform:translateY(10px); transition:opacity .55s ease, transform .55s ease; }
-    .reveal.is-in{ opacity:1; transform:translateY(0); }
-
-    :focus-visible{ outline:2px solid rgba(228,149,16,.55); outline-offset:3px; border-radius:14px; }
-
-    /* MODAL */
-    .modal{
-      position:fixed;
-      inset:0;
-      z-index:80;
-      display:none;
-      align-items:center;
-      justify-content:center;
-      padding:24px;
-      background:rgba(0,0,0,.55);
-      backdrop-filter:blur(12px);
-      -webkit-backdrop-filter:blur(12px);
+    .contactBox {
+      margin-top: 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
     }
 
-    .modal.isOpen{ display:flex; }
-
-    .modalPanel{
-      width:min(920px, 92vw);
-      max-height:min(82vh, 820px);
-      overflow:auto;
-      border-radius:22px;
-      border:1px solid rgba(255,255,255,.12);
-      background:
-        radial-gradient(900px 520px at 20% 0%, rgba(255,255,255,.05), transparent 60%),
-        radial-gradient(900px 520px at 85% 10%, rgba(228,149,16,.14), transparent 62%),
-        linear-gradient(180deg, rgba(11,12,16,.96), rgba(11,12,16,.985));
-      box-shadow:0 28px 120px rgba(0,0,0,.65);
-      position:relative;
-      padding:18px 18px 16px;
+    .contactNote {
+      margin: 0;
+      color: var(--text-subtle);
+      font-size: 14px;
+      font-weight: 500;
     }
 
-    .modalTop{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:12px;
-      padding:6px 2px 12px;
-      border-bottom:1px solid rgba(255,255,255,.08);
-      margin-bottom:14px;
+    /* Reveal Animations */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), 
+                  transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
-    .modalTitle{ margin:0; font-size:16px; font-weight:900; letter-spacing:-0.01em; text-transform:uppercase; }
-    .modalPrice{ margin-top:6px; color:rgba(255,255,255,.70); font-size:14px; }
-
-    .modalActions{ display:flex; align-items:center; gap:10px; flex:0 0 auto; }
-
-    .modalClose{
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(255,255,255,.06);
-      color:rgba(255,255,255,.85);
-      border-radius:14px;
-      width:42px;
-      height:42px;
-      display:grid;
-      place-items:center;
-      cursor:pointer;
-      transition:transform .2s ease;
-      flex:0 0 auto;
+    .reveal.is-in {
+      opacity: 1;
+      transform: translateY(0);
     }
 
-    .modalClose:hover{ transform:translateY(-1px); }
-    .modalClose:active{ transform:translateY(0); }
+    /* Staggered children animation */
+    .reveal-stagger > * {
+      opacity: 0;
+      transform: translateY(25px);
+      transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1), 
+                  transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    }
 
-    .modalBody{ text-align:left; line-height:1.75; color:rgba(255,255,255,.90); padding:2px 2px 12px; }
+    .reveal-stagger.is-in > *:nth-child(1) { transition-delay: 0ms; opacity: 1; transform: translateY(0); }
+    .reveal-stagger.is-in > *:nth-child(2) { transition-delay: 100ms; opacity: 1; transform: translateY(0); }
+    .reveal-stagger.is-in > *:nth-child(3) { transition-delay: 200ms; opacity: 1; transform: translateY(0); }
+    .reveal-stagger.is-in > *:nth-child(4) { transition-delay: 300ms; opacity: 1; transform: translateY(0); }
+    .reveal-stagger.is-in > *:nth-child(5) { transition-delay: 400ms; opacity: 1; transform: translateY(0); }
 
-    .modalBody h4{ margin:16px 0 6px; font-size:14px; text-transform:uppercase; letter-spacing:.06em; color:rgba(255,255,255,.76); }
-    .modalBody p{ margin:0 0 12px; color:rgba(255,255,255,.74); font-size:15px; }
-    .modalBody ul{ margin:8px 0 12px; padding-left:18px; color:rgba(255,255,255,.74); font-size:15px; }
+    /* Text reveal - word by word */
+    .text-reveal {
+      overflow: hidden;
+    }
 
-    .modalFooter{ display:flex; justify-content:flex-end; gap:10px; border-top:1px solid rgba(255,255,255,.08); padding-top:14px; margin-top:6px; }
+    .text-reveal .word {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(100%);
+      transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    }
 
-    @media (max-width: 920px){
-      nav{ display:none; }
-      .layer{ padding:70px 0 54px; }
-      .heroLayer{ padding:92px 0 72px; min-height:84vh; }
-      .products{ grid-template-columns:1fr; }
-      .partnerLogo{ height:28px; }
-      .missionRow{ grid-template-columns:1fr; grid-template-areas:"text" "media"; }
-      .missionRow.swap{ grid-template-areas:"text" "media"; }
-      .missionMedia{ min-height:220px; }
-      #mise .sectionTitle{ font-size:26px; }
-      .missionCard{ padding:22px; border-right:1px solid rgba(255,255,255,.10); border-radius:22px 22px 0 0; }
-      .missionRow .missionMedia{ border-radius:0 0 22px 22px; }
+    .text-reveal.is-in .word {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Fade up variants */
+    .reveal-fade {
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+
+    .reveal-fade.is-in {
+      opacity: 1;
+    }
+
+    .reveal-slide-left {
+      opacity: 0;
+      transform: translateX(-40px);
+      transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .reveal-slide-left.is-in {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .reveal-slide-right {
+      opacity: 0;
+      transform: translateX(40px);
+      transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .reveal-slide-right.is-in {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* Scale reveal */
+    .reveal-scale {
+      opacity: 0;
+      transform: scale(0.9);
+      transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .reveal-scale.is-in {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* Mission rows alternating slide */
+    .missionRow {
+      opacity: 0;
+      transform: translateX(-30px);
+      transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .missionRow.swap {
+      transform: translateX(30px);
+    }
+
+    .missionRow.is-in {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* Product cards stagger */
+    .product {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .product.is-in {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* FAQ items stagger */
+    .faqItem {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .faqItem.is-in {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Hero specific animations */
+    .heroH1 {
+      opacity: 0;
+      transform: translateY(30px);
+      animation: heroReveal 1s cubic-bezier(0.22, 1, 0.36, 1) 0.2s forwards;
+    }
+
+    .heroH2 {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: heroReveal 1s cubic-bezier(0.22, 1, 0.36, 1) 0.4s forwards;
+    }
+
+    .heroCtas {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: heroReveal 1s cubic-bezier(0.22, 1, 0.36, 1) 0.6s forwards;
+    }
+
+    .heroBottomStat {
+      opacity: 0;
+      animation: fadeIn 1s ease 1s forwards;
+    }
+
+    @keyframes heroReveal {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* Smooth scroll behavior */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Parallax subtle effect */
+    .parallax-slow {
+      will-change: transform;
+    }
+
+    /* Responsive */
+    @media (min-width: 980px) {
+      .heroH2 { white-space: nowrap; }
+    }
+
+    @media (max-width: 920px) {
+      nav { display: none; }
+      .layer { padding: 70px 0 54px; }
+      .heroLayer { padding: 92px 0 72px; min-height: 84vh; }
+
+      .heroBottomStat {
+        white-space: nowrap;
+        flex-wrap: nowrap;
+        font-size: 10px;
+        gap: 8px;
+        letter-spacing: 0.08em;
+        bottom: 12px;
+        padding: 0 16px;
+      }
+
+      .products { grid-template-columns: 1fr; }
+
+      #mise { padding-top: 40px; padding-bottom: 48px; }
+      #mise .sectionTitle { font-size: 24px; margin-bottom: 8px; }
+      #mise .sectionText { font-size: 15px; line-height: 1.6; padding: 0 8px; }
+
+      .missionIntro { margin-top: 16px; padding: 0 4px; }
+      .missionIntro p { font-size: 16px; line-height: 1.7; text-align: left; }
+
+      .missionRows { margin-top: 28px; gap: 20px; }
+
+      .missionRow {
+        grid-template-columns: 1fr;
+        grid-template-areas: "text" "media";
+      }
+
+      .missionRow.swap { grid-template-areas: "text" "media"; }
+
+      .missionCard {
+        padding: 20px;
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 18px 18px 0 0;
+      }
+
+      .missionCard h3 { font-size: 16px; margin-bottom: 8px; }
+      .missionCard p { font-size: 14px; line-height: 1.65; margin-bottom: 8px; }
+      .missionCard ul { font-size: 14px; line-height: 1.6; margin: 8px 0; padding-left: 16px; }
+
+      .missionRow .missionMedia {
+        min-height: 200px;
+        border-radius: 0 0 18px 18px;
+      }
+
+      .missionRow.swap .missionCard {
+        border-radius: 18px 18px 0 0;
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+        border-left: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .missionRow.swap .missionMedia { border-radius: 0 0 18px 18px; }
+
+      .missionMediaLabel {
+        font-size: 11px;
+        padding: 8px 10px;
+        left: 12px;
+        bottom: 12px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .heroBottomStat {
+        font-size: 9px;
+        gap: 6px;
+        letter-spacing: 0.06em;
+      }
+
+      .heroH1 { font-size: 26px; padding: 0 8px; }
+      .heroH2 { font-size: 14px; padding: 0 12px; }
+      .missionIntro p { font-size: 15px; }
+      .missionCard { padding: 18px 16px; }
+      .missionCard h3 { font-size: 15px; }
+      .missionCard p, .missionCard ul { font-size: 13px; }
     }
   </style>
 </head>
@@ -766,46 +952,43 @@
         </div>
 
         <nav aria-label="Hlavní navigace">
-          <a href="video.html" title="Video">▶ Video</a>
+          <a href="#" title="Video">▶ Video</a>
           <a href="#modely" title="Členství">Členství</a>
         </nav>
       </div>
     </header>
 
     <!-- HERO -->
-    <main class="layer heroLayer hasBg" id="top" style="--bg-img: url('hero-bg.jpg');" aria-label="Přistávací náhled">
-      <section class="layerInner reveal is-in">
+    <main class="layer heroLayer hasBg" id="top" style="--bg-img: linear-gradient(135deg, #0a0a0a 0%, #111 50%, #0a0a0a 100%);">
+      <section class="layerInner">
         <h1 class="heroH1">Proměň svůj skill v publikum a reálné příležitosti.</h1>
         <p class="heroH2">Systém a komunita pro DJs, kteří nechtějí jen trénovat, ale být vidět a posunout se dál.</p>
         <div class="heroCtas">
-          <a class="btn btnPrimary" href="video.html" id="ctaVideo">▶ Pusť si video</a>
-          <a class="btn btnGhost" href="#modely" id="ctaMembership">Zobrazit členství</a>
+          <a class="btn btnPrimary" href="#">▶ Pusť si video</a>
+          <a class="btn btnGhost" href="#modely">Zobrazit členství</a>
         </div>
       </section>
 
-      <!-- HERO BOTTOM STAT -->
-      <div class="heroBottomStat" aria-label="Rychlá metrika">
-        <span class="statText">30+ AKTIVNÍCH ČLENŮ</span>
-        <span class="sep" aria-hidden="true">•</span>
-        <span class="statText">UZAVŘENÝ VSTUP</span>
-        <span class="sep" aria-hidden="true">•</span>
-        <span class="statText">PRAVIDELNÉ VÝSTUPY</span>
+      <div class="heroBottomStat">
+        <span class="statText">30 AKTIVNÍCH DJS</span>
+        <span class="sep">•</span>
+        <span class="statText">REÁLNÉ BOOKINGY</span>
+        <span class="sep">•</span>
+        <span class="statText">NETWORKING & INVITATION ONLY</span>
       </div>
     </main>
 
-
-
     <!-- MISE -->
-    <section class="layer layerAlt" id="mise" aria-label="Mise">
-      <div class="layerInner reveal is-in">
-        <h2 class="sectionTitle">Mise</h2>
-        <p class="sectionText">Talent Room je systém spolupráce a výstupů pro DJs, kteří chtějí publikum a reálné příležitosti.</p>
+    <section class="layer layerAlt" id="mise">
+      <div class="layerInner">
+        <h2 class="sectionTitle reveal">Proč to děláme</h2>
+        <p class="sectionText reveal">Talent Room je systém spolupráce a výstupů pro DJs, kteří chtějí publikum a reálné příležitosti.</p>
 
-        <div class="missionIntro">
+        <div class="missionIntro reveal">
           <p>Česká DJ kultura není malá ani slabá. Je roztříštěná. Ne proto, že by lidé neuměli hrát — ale protože chybí jedno místo, které drží standard, zrychluje výstupy a podporuje spolupráci napříč scénami.</p>
         </div>
 
-        <div class="missionRows" aria-label="Mise sekce">
+        <div class="missionRows">
           <div class="missionRow">
             <div class="missionCard">
               <h3>Proč to existuje</h3>
@@ -816,53 +999,55 @@
                 <li>výstupy místo tréninku do prázdna</li>
               </ul>
             </div>
-            <!-- POZN.: V každé Mission sekci počítej s tím, že místo obrázku bude vložené VIDEO (embed / player). -->
-            <div class="missionMedia" data-media="video" style="--img: url('mission-1.jpg');" aria-label="Mise obrázek 1">
+            <div class="missionMedia">
               <div class="missionMediaLabel">Spolupráce</div>
             </div>
           </div>
 
           <div class="missionRow swap">
             <div class="missionCard">
-              <h3>DJing je cesta</h3>
-              <p>DJing není cíl. Je to vstupní bod k publiku, portfoliu a dalším příležitostem. Bez systému zůstane většina lidí neviditelná.</p>
+              <h3>Od mixu k bookingu</h3>
+              <p>DJing není cíl. Je to vstupní bod k publiku, brandingu a dalším příležitostem. Bez systému zůstaneš neviditelný.</p>
               <ul>
-                <li>portfolio, které jde ukázat</li>
-                <li>output, který jde publikovat</li>
-                <li>další krok (bookingy, positioning)</li>
+                <li>Exkluzívní Edity a Remixy</li>
+                <li>Sety, které jdou publikovat</li>
+                <li>Portfolio, které jde ukázat</li>
+                <li>Kontakty na promotéry</li>
+                <li>Přístup na omezené akce</li>
               </ul>
             </div>
-            <div class="missionMedia" data-media="video" style="--img: url('mission-2.jpg');" aria-label="Mise obrázek 2">
+            <div class="missionMedia">
               <div class="missionMediaLabel">Výstupy</div>
             </div>
           </div>
 
           <div class="missionRow">
             <div class="missionCard">
-              <h3>Multitalent bez chaosu</h3>
-              <p>Technika je dostupná. Konkurence je globální. Pozornost je měna. Rozhoduje schopnost prezentace, obsahu a systémů.</p>
+              <h3>Systém místo chaosu</h3>
+              <p>Víš, že bys měl "dělat content". Ale jaký? Kdy? Jak často? Tady dostaneš jasný plán.</p>
               <ul>
-                <li>content bez chaosu</li>
-                <li>pravidelnost místo nárazů</li>
-                <li>směr místo motivace</li>
+                <li>Týdenní struktura, ne náhodné posty</li>
+                <li>Šablony na content</li>
+                <li>Deadliny, které tě drží v tempu</li>
               </ul>
             </div>
-            <div class="missionMedia" data-media="video" style="--img: url('mission-3.jpg');" aria-label="Mise obrázek 3">
+            <div class="missionMedia">
               <div class="missionMediaLabel">Systém</div>
             </div>
           </div>
 
           <div class="missionRow swap">
             <div class="missionCard">
-              <h3>Technologie i lidskost</h3>
-              <p>AI a automatizace jsou nástroje. Hudba je o lidech a emocích. Talent Room spojuje výkon se skutečným prostředím.</p>
+              <h3>Online + fyzický prostor</h3>
+              <p>AI a automatizace šetří čas. Ale hudba je o lidech. Kombinujeme obojí — nástroje i reálné prostředí.</p>
               <ul>
-                <li>nástroje, které šetří čas</li>
-                <li>prostředí, které drží tempo</li>
-                <li>lidi, kteří zvedají standard</li>
+                <li>AI nástroje pro rychlejší práci</li>
+                <li>Studio v Ostravě pro nahrávání a stream</li>
+                <li>Lidi, kteří ti dají feedback</li>
+                <li>Networking a nové příležitosti</li>
               </ul>
             </div>
-            <div class="missionMedia" data-media="video" style="--img: url('mission-4.jpg');" aria-label="Mise obrázek 4">
+            <div class="missionMedia">
               <div class="missionMediaLabel">Prostředí</div>
             </div>
           </div>
@@ -870,14 +1055,14 @@
       </div>
     </section>
 
-    <!-- PRODUKTY / ČLENSTVÍ -->
-    <section class="layer layerAlt layerLight" id="modely" aria-label="Členství">
-      <div class="layerInner reveal is-in">
-        <h2 class="sectionTitle">Členství</h2>
-        <p class="sectionText">Vyber úroveň podle toho, jaký další krok chceš udělat.</p>
+    <!-- PRODUKTY -->
+    <section class="layer layerAlt layerLight" id="modely">
+      <div class="layerInner">
+        <h2 class="sectionTitle reveal">Členství</h2>
+        <p class="sectionText reveal">Vyber úroveň podle toho, jaký další krok chceš udělat.</p>
 
-        <div class="products" aria-label="Produkty vedle sebe">
-          <article class="product productHighlight" aria-label="Online Access">
+        <div class="products">
+          <article class="product productHighlight">
             <div class="productBadge">Doporučujeme</div>
             <h3 class="productTitle">Online Access</h3>
             <p class="productMini">Strukturovaný systém pro DJs, kteří chtějí týdenní výstupy místo náhodného tréninku.</p>
@@ -889,56 +1074,56 @@
               <li>Uzavřená komunita aktivních členů</li>
             </ul>
             <div class="productMedia">
-              <button class="productImageBtn" type="button" data-model="online" aria-label="Otevřít detail Online Access">
-                <div class="productImage" style="--img: url('online-model.jpg');" role="img" aria-label="Online Access obrázek"></div>
+              <button class="productImageBtn" type="button">
+                <div class="productImage"></div>
               </button>
             </div>
             <p class="productPrice">690 Kč / měsíc</p>
             <div class="productCtaUnder">
-              <a class="btn btnPrimary btnSmall" href="https://example.com/stripe-online" data-cta="online">Vstoupit</a>
+              <a class="btn btnPrimary btnSmall" href="#">Vstoupit</a>
             </div>
           </article>
 
-          <article class="product productHasBadge" aria-label="Studio Access">
-            <div class="productBadgeAlt">Prostředí zrychluje</div>
+          <article class="product">
+            <div class="productBadgeAlt">Pro ty v Ostravě</div>
             <h3 class="productTitle">Studio Access</h3>
-            <p class="productMini">Online systém + fyzický prostor pro nahrávání setů, streamů a contentu.</p>
+            <p class="productMini">Vše z Online + studio v Ostravě. Přijď, nahraj, odejdi s hotovým setem.</p>
             <ul class="productBullets">
               <li>Vše z Online Access</li>
-              <li>Přístup do DJ studia s rezervačním systémem</li>
-              <li>Nahrávání v kvalitě pro publikování</li>
-              <li>Fokus bloky bez rozptylování</li>
+              <li>Studio v Ostravě — rezervuj si slot, kdy potřebuješ</li>
+              <li>Nahrávání v profi kvalitě</li>
+              <li>Fokus prostředí — žádné rozptylování</li>
             </ul>
             <div class="productMedia">
-              <button class="productImageBtn" type="button" data-model="studio" aria-label="Otevřít detail Studio Access">
-                <div class="productImage" style="--img: url('hybrid-model.jpg');" role="img" aria-label="Studio Access obrázek"></div>
+              <button class="productImageBtn" type="button">
+                <div class="productImage"></div>
               </button>
             </div>
             <p class="productPrice">1 490 Kč / měsíc</p>
             <div class="productCtaUnder">
-              <a class="btn btnPrimary btnSmall" href="#kontakt" data-cta="studio">Požádat o přístup</a>
+              <a class="btn btnPrimary btnSmall" href="#">Chci Studio</a>
             </div>
           </article>
 
-          <article class="product productHasBadge" aria-label="Mentoring Access">
-            <div class="productBadgeAlt">Limitovaná místa</div>
+          <article class="product">
+            <div class="productBadgeAlt">Max 3 lidi</div>
             <h3 class="productTitle">Mentoring Access</h3>
-            <p class="productMini">Přímé vedení a feedback pro ty, kdo chtějí nejrychlejší posun.</p>
+            <p class="productMini">1:1 vedení. Feedback na každý set. Pro ty, kdo chtějí nejrychlejší cestu.</p>
             <ul class="productBullets">
-              <li>Vše z Online + Studio Access</li>
-              <li>Feedback na sety, content a směr</li>
-              <li>Pomoc s bookingama a positioningem</li>
-              <li>Priorita v systému</li>
-              <li>Limitovaný počet míst</li>
+              <li>Vše z Online + Studio</li>
+              <li>Detailní feedback na každý set</li>
+              <li>Pomoc s oslovením promotérů</li>
+              <li>Priorita ve všem — sloty, příležitosti</li>
+              <li>Max 3 míst — teď volné 1</li>
             </ul>
             <div class="productMedia">
-              <button class="productImageBtn" type="button" data-model="mentoring" aria-label="Otevřít detail Mentoring Access">
-                <div class="productImage" style="--img: url('engine-model.jpg');" role="img" aria-label="Mentoring Access obrázek"></div>
+              <button class="productImageBtn" type="button">
+                <div class="productImage"></div>
               </button>
             </div>
             <p class="productPrice">od 3 000 Kč / měsíc</p>
             <div class="productCtaUnder">
-              <a class="btn btnPrimary btnSmall" href="#kontakt" data-cta="mentoring">Požádat o přístup</a>
+              <a class="btn btnPrimary btnSmall" href="#">Chci Mentoring</a>
             </div>
           </article>
         </div>
@@ -946,10 +1131,10 @@
     </section>
 
     <!-- FAQ -->
-    <section class="layer layerAlt" id="faq" aria-label="FAQ">
-      <div class="layerInner reveal is-in">
-        <h2 class="sectionTitle">FAQ</h2>
-        <p class="sectionText">Rychlé odpovědi, než se přidáš.</p>
+    <section class="layer layerAlt" id="faq">
+      <div class="layerInner">
+        <h2 class="sectionTitle reveal">FAQ</h2>
+        <p class="sectionText reveal">Rychlé odpovědi, než se přidáš.</p>
 
         <div class="faqWrap">
           <details class="faqItem">
@@ -996,13 +1181,13 @@
     </section>
 
     <!-- KONTAKT -->
-    <section class="layer layerAlt" id="kontakt" aria-label="Kontakt">
-      <div class="layerInner reveal is-in">
-        <h2 class="sectionTitle">Rezervuj si místo</h2>
-        <p class="sectionText">15minutový call. Zjistíme, jestli je Talent Room pro tebe.</p>
+    <section class="layer layerAlt" id="kontakt">
+      <div class="layerInner">
+        <h2 class="sectionTitle reveal">Rezervuj si místo</h2>
+        <p class="sectionText reveal">15minutový call. Zjistíme, jestli je Talent Room pro tebe.</p>
         
-        <div class="contactBox">
-          <a class="btn btnPrimary btnLarge" href="https://calendly.com/talentroom" target="_blank" rel="noopener">Zarezervovat call</a>
+        <div class="contactBox reveal">
+          <a class="btn btnPrimary btnLarge" href="#">Zarezervovat call</a>
           <p class="contactNote">Bez závazků. Bez prodejního tlaku.</p>
         </div>
       </div>
@@ -1010,315 +1195,219 @@
 
   </div>
 
-  <!-- MODAL -->
-  <div class="modal" id="modelModal" aria-hidden="true">
-    <div class="modalPanel" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-      <div class="modalTop">
-        <div>
-          <h3 class="modalTitle" id="modalTitle">MODEL</h3>
-          <div class="modalPrice" id="modalPrice">Cena</div>
-        </div>
-
-        <div class="modalActions">
-          <a class="btn btnPrimary btnSmall" href="#kontakt" id="modalTopCta">Získat</a>
-          <button class="modalClose" type="button" id="modalClose" aria-label="Zavřít">✕</button>
-        </div>
-      </div>
-
-      <div class="modalBody" id="modalBody"></div>
-
-      <div class="modalFooter" id="modalFooter">
-        <a class="btn btnPrimary btnSmall" href="#kontakt" id="modalCta">Získat</a>
-      </div>
-    </div>
-  </div>
-
-  <!-- TEMPLATES -->
-  <template id="tpl-online">
-    <p><strong>Podtitul</strong><br>Základní systém, který promění tvůj skill ve výstupy.</p>
-
-    <p><strong>ONLINE ACCESS</strong> je vstupní bod do Talent Room.</p>
-    <p>Není to kurz.<br>Není to knihovna.<br>Je to strukturovaný systém, který tě přestane nechávat tápat.</p>
-
-    <h4>Pokud máš skill, ale…</h4>
-    <ul>
-      <li>nevíš, co přesně dělat každý týden</li>
-      <li>nemáš konzistentní výstupy</li>
-      <li>stagnuješ mezi tréninkem a realitou</li>
-    </ul>
-    <p>→ Dostaneš řád, tlak a směr.</p>
-
-    <h4>Co přesně získáš</h4>
-    <ul>
-      <li><strong>3denní výzvu</strong> (rychlý start + první výstupy)</li>
-      <li><strong>44denní roadmapu</strong> + týdenní výstupy (jasný rytmus)</li>
-      <li><strong>Promo & content systém</strong> (output bez chaosu)</li>
-      <li><strong>Contests</strong> (deadliny + tlak na výstup)</li>
-      <li><strong>Uzavřenou online komunitu</strong> (přístup jen pro aktivní členy)</li>
-    </ul>
-
-    <h4>Exclusive Music & Producer Packs</h4>
-    <ul>
-      <li>exclusive tracks / edits (kurátorovaně)</li>
-      <li>producer packs & samplery (připravené k použití)</li>
-    </ul>
-
-    <p><em>Neučíme tě „víc hudby".</em><br>Učíme tě přestat být neviditelný.</p>
-  </template>
-
-  <template id="tpl-hybrid">
-    <p><strong>Podtitul</strong><br>Systém + prostor + kontrolovaný přístup. Rychlejší výstupy.</p>
-
-    <p><strong>STUDIO ACCESS</strong> je pro ty, kdo chtějí víc než online.</p>
-    <p>Protože realita je jednoduchá:<br><strong>Prostředí rozhoduje o výkonu.</strong></p>
-
-    <h4>Doma:</h4>
-    <ul>
-      <li>odkládáš</li>
-      <li>rozptyluješ se</li>
-      <li>nemáš tlak</li>
-    </ul>
-
-    <p>Studio Access ti dává fyzické prostředí, kde:</p>
-    <ul>
-      <li>se pracuje</li>
-      <li>vzniká obsah</li>
-      <li>vznikají výstupy</li>
-    </ul>
-    <p>Bez chaosu. Bez náhodných lidí.</p>
-
-    <h4>Co přesně získáš</h4>
-    <ul>
-      <li><strong>Vše z Online Access</strong></li>
-      <li>Přístup do DJ room / cowork prostoru</li>
-      <li>Rezervační systém (jasná pravidla, žádný boj o čas)</li>
-      <li>Nahrávání setů, streamů a contentu</li>
-      <li>Fokus bloky (hlavně dopoledne)</li>
-      <li>Uzavřený Discord pouze pro aktivní členy</li>
-    </ul>
-
-    <p><em>Studio není zkušebna.</em><br>Studio je nástroj na výstupy.</p>
-  </template>
-
-  <template id="tpl-engine">
-    <p><strong>Podtitul</strong><br>Mentoring, priorita a nejrychlejší posun.</p>
-
-    <p><strong>MENTORING ACCESS</strong> je nejvyšší úroveň Talent Room.</p>
-    <p>Není pro každého. A ani nemá být.</p>
-
-    <p>Je pro ty, kdo:</p>
-    <ul>
-      <li>chtějí jasný směr</li>
-      <li>chtějí zpětnou vazbu</li>
-      <li>chtějí být vedeni</li>
-    </ul>
-
-    <h4>Bez mentoringu:</h4>
-    <ul>
-      <li>děláš zbytečné chyby</li>
-      <li>nevíš, co zlepšit dřív</li>
-      <li>ztrácíš čas</li>
-    </ul>
-
-    <h4>Co přesně získáš</h4>
-    <ul>
-      <li>Limitovaný přístup (malý počet členů)</li>
-      <li>Mentoring 1:many</li>
-      <li>Detailní feedback na sety, content a směr</li>
-      <li>Pomoc s dalšími kroky (publikum, bookingy, positioning)</li>
-      <li>Prioritu v systému</li>
-    </ul>
-
-    <p><em>Neslibujeme úspěch.</em><br>Dáváme ti nejlepší možnou šanci.</p>
-  </template>
-
   <script>
-    (function(){
+    (function() {
       'use strict';
 
-      // Prevent accidental double-init (e.g., when hot-reloading or scripts injected twice)
-      // Uses var to avoid "duplicate variable" errors.
-      if (window.__talentRoomInit) return;
-      window.__talentRoomInit = true;
-
-      // Reveal on scroll
-      var trRevealEls = document.querySelectorAll('.reveal');
-      var trObserver = new IntersectionObserver(function(entries){
-        entries.forEach(function(entry){
-          if(entry.isIntersecting){
+      // ===========================================
+      // SCROLL REVEAL SYSTEM
+      // ===========================================
+      
+      const revealElements = document.querySelectorAll('.reveal, .missionRow, .product, .faqItem');
+      
+      const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
             entry.target.classList.add('is-in');
-            trObserver.unobserve(entry.target);
           }
         });
-      }, { threshold: 0.12 });
+      }, { 
+        threshold: 0.15,
+        rootMargin: '0px 0px -50px 0px'
+      });
 
-      trRevealEls.forEach(function(el){ trObserver.observe(el); });
+      revealElements.forEach((el) => revealObserver.observe(el));
 
-      // Smooth scroll for Membership CTA
-      var trCtaMembership = document.getElementById('ctaMembership');
-      if (trCtaMembership) {
-        trCtaMembership.addEventListener('click', function(e){
-          var trTarget = document.getElementById('modely');
-          if (trTarget) {
+      // ===========================================
+      // STAGGERED PRODUCT CARDS
+      // ===========================================
+      
+      const products = document.querySelectorAll('.product');
+      const productObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry, index) => {
+          if (entry.isIntersecting) {
+            // Add stagger delay based on index
+            const allProducts = Array.from(products);
+            const idx = allProducts.indexOf(entry.target);
+            setTimeout(() => {
+              entry.target.classList.add('is-in');
+            }, idx * 150);
+          }
+        });
+      }, { threshold: 0.2 });
+
+      products.forEach((el) => productObserver.observe(el));
+
+      // ===========================================
+      // STAGGERED FAQ ITEMS
+      // ===========================================
+      
+      const faqItems = document.querySelectorAll('.faqItem');
+      const faqObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const allFaq = Array.from(faqItems);
+            const idx = allFaq.indexOf(entry.target);
+            setTimeout(() => {
+              entry.target.classList.add('is-in');
+            }, idx * 100);
+          }
+        });
+      }, { threshold: 0.2 });
+
+      faqItems.forEach((el) => faqObserver.observe(el));
+
+      // ===========================================
+      // MISSION ROWS ALTERNATING REVEAL
+      // ===========================================
+      
+      const missionRows = document.querySelectorAll('.missionRow');
+      const missionObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const allRows = Array.from(missionRows);
+            const idx = allRows.indexOf(entry.target);
+            setTimeout(() => {
+              entry.target.classList.add('is-in');
+            }, idx * 200);
+          }
+        });
+      }, { threshold: 0.2 });
+
+      missionRows.forEach((el) => missionObserver.observe(el));
+
+      // ===========================================
+      // TEXT REVEAL - WORD BY WORD
+      // ===========================================
+      
+      function splitTextIntoWords(element) {
+        const text = element.textContent;
+        const words = text.split(' ');
+        element.innerHTML = '';
+        
+        words.forEach((word, index) => {
+          const span = document.createElement('span');
+          span.className = 'word';
+          span.textContent = word + ' ';
+          span.style.transitionDelay = `${index * 50}ms`;
+          element.appendChild(span);
+        });
+      }
+
+      const textReveals = document.querySelectorAll('.text-reveal');
+      textReveals.forEach(el => splitTextIntoWords(el));
+
+      const textObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-in');
+          }
+        });
+      }, { threshold: 0.5 });
+
+      textReveals.forEach((el) => textObserver.observe(el));
+
+      // ===========================================
+      // PARALLAX EFFECT (subtle)
+      // ===========================================
+      
+      const parallaxElements = document.querySelectorAll('.parallax-slow');
+      
+      function updateParallax() {
+        const scrolled = window.pageYOffset;
+        
+        parallaxElements.forEach(el => {
+          const speed = 0.3;
+          const rect = el.getBoundingClientRect();
+          const offsetTop = rect.top + scrolled;
+          const yPos = (scrolled - offsetTop) * speed;
+          
+          if (rect.top < window.innerHeight && rect.bottom > 0) {
+            el.style.transform = `translateY(${yPos}px)`;
+          }
+        });
+      }
+
+      let parallaxTicking = false;
+      window.addEventListener('scroll', () => {
+        if (!parallaxTicking) {
+          requestAnimationFrame(() => {
+            updateParallax();
+            parallaxTicking = false;
+          });
+          parallaxTicking = true;
+        }
+      }, { passive: true });
+
+      // ===========================================
+      // SMOOTH SCROLL FOR ANCHOR LINKS
+      // ===========================================
+      
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+          const href = this.getAttribute('href');
+          if (href === '#') return;
+          
+          const target = document.querySelector(href);
+          if (target) {
             e.preventDefault();
-            trTarget.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            target.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start'
+            });
           }
         });
-      }
+      });
 
-      // Smooth scroll for in-page header links (only anchors)
-      document.querySelectorAll('header nav a[href^="#"]').forEach(function(a){
-        a.addEventListener('click', function(e){
-          var href = a.getAttribute('href') || '';
-          var id = href.startsWith('#') ? href.slice(1) : '';
-          var el = id ? document.getElementById(id) : null;
-          if (!el) return;
-          e.preventDefault();
-          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // ===========================================
+      // BUTTON HOVER EFFECTS
+      // ===========================================
+      
+      const buttons = document.querySelectorAll('.btn');
+      buttons.forEach(btn => {
+        btn.addEventListener('mouseenter', function(e) {
+          const rect = this.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          
+          this.style.setProperty('--mouse-x', `${x}px`);
+          this.style.setProperty('--mouse-y', `${y}px`);
         });
       });
 
-      // ===== Modal logic =====
-      var trModal = document.getElementById('modelModal');
-      var trModalClose = document.getElementById('modalClose');
-      var trModalTitle = document.getElementById('modalTitle');
-      var trModalPrice = document.getElementById('modalPrice');
-      var trModalBody = document.getElementById('modalBody');
-      var trModalCta = document.getElementById('modalCta');
-      var trModalTopCta = document.getElementById('modalTopCta');
-
-      var TR_MODEL_META = {
-        online: {
-          title: 'Online Access',
-          price: '690 Kč / měsíc',
-          tpl: 'tpl-online',
-          ctaText: 'Vstoupit do Online Access',
-          ctaHref: 'https://example.com/stripe-online'
-        },
-        studio: {
-          title: 'Studio Access',
-          price: '1 490 Kč / měsíc',
-          tpl: 'tpl-hybrid',
-          ctaText: 'Požádat o Studio Access',
-          ctaHref: '#kontakt'
-        },
-        mentoring: {
-          title: 'Mentoring Access',
-          price: 'od 3 000 Kč / měsíc (limit)',
-          tpl: 'tpl-engine',
-          ctaText: 'Požádat o Mentoring Access',
-          ctaHref: '#kontakt'
-        }
-      };
-
-      function trOpenModal(key){
-        var meta = TR_MODEL_META[key];
-        if(!meta || !trModal) return;
-
-        trModalTitle.textContent = meta.title;
-        trModalPrice.textContent = meta.price;
-
-        if(trModalCta){
-          trModalCta.textContent = meta.ctaText;
-          trModalCta.setAttribute('href', meta.ctaHref);
-        }
-        if(trModalTopCta){
-          trModalTopCta.textContent = meta.ctaText;
-          trModalTopCta.setAttribute('href', meta.ctaHref);
-        }
-
-        var tpl = document.getElementById(meta.tpl);
-        trModalBody.innerHTML = '';
-        if(tpl && 'content' in tpl){
-          trModalBody.appendChild(tpl.content.cloneNode(true));
-        }
-
-        trModal.classList.add('isOpen');
-        trModal.setAttribute('aria-hidden', 'false');
-        document.body.style.overflow = 'hidden';
-      }
-
-      function trCloseModal(){
-        if(!trModal) return;
-        trModal.classList.remove('isOpen');
-        trModal.setAttribute('aria-hidden', 'true');
-        document.body.style.overflow = '';
-      }
-
-      document.querySelectorAll('.productImageBtn').forEach(function(btn){
-        btn.addEventListener('click', function(){ trOpenModal(btn.dataset.model); });
-      });
-
-      if(trModalClose){ trModalClose.addEventListener('click', trCloseModal); }
-
-      if(trModal){
-        trModal.addEventListener('click', function(e){
-          if(e.target === trModal) trCloseModal();
-        });
-      }
-
-      window.addEventListener('keydown', function(e){
-        if(e.key === 'Escape' && trModal && trModal.classList.contains('isOpen')) trCloseModal();
-      });
-
-      // ===== Product Glow (subtle) =====
-      var trGlowTargets = Array.prototype.slice.call(document.querySelectorAll('.productImage'));
-      var trGlowCfg = { proximity: 72, inactiveZone: 0.18 };
-      var trGlowRaf = 0;
-      var trLastPointer = { x: 0, y: 0 };
-
-      function trUpdateGlow(){
-        trGlowRaf = 0;
-        var x = trLastPointer.x;
-        var y = trLastPointer.y;
-
-        trGlowTargets.forEach(function(el){
-          var r = el.getBoundingClientRect();
-          var cx = r.left + r.width * 0.5;
-          var cy = r.top + r.height * 0.5;
-
-          var dist = Math.hypot(x - cx, y - cy);
-          var inactiveRadius = 0.5 * Math.min(r.width, r.height) * trGlowCfg.inactiveZone;
-
-          if(dist < inactiveRadius){
-            el.style.setProperty('--glowActive', '0');
-            return;
+      // ===========================================
+      // SECTION TITLE COUNTER ANIMATION
+      // ===========================================
+      
+      function animateCounter(element, target, duration = 2000) {
+        const start = 0;
+        const increment = target / (duration / 16);
+        let current = start;
+        
+        const timer = setInterval(() => {
+          current += increment;
+          if (current >= target) {
+            element.textContent = target;
+            clearInterval(timer);
+          } else {
+            element.textContent = Math.floor(current);
           }
-
-          var isActive =
-            x > r.left - trGlowCfg.proximity &&
-            x < r.right + trGlowCfg.proximity &&
-            y > r.top - trGlowCfg.proximity &&
-            y < r.bottom + trGlowCfg.proximity;
-
-          el.style.setProperty('--glowActive', isActive ? '1' : '0');
-          if(!isActive) return;
-
-          var angle = (Math.atan2(y - cy, x - cx) * 180) / Math.PI + 90;
-          el.style.setProperty('--glowAngle', angle + 'deg');
-        });
+        }, 16);
       }
 
-      document.addEventListener('pointermove', function(e){
-        trLastPointer = { x: e.clientX, y: e.clientY };
-        if(!trGlowRaf) trGlowRaf = requestAnimationFrame(trUpdateGlow);
-      }, { passive:true });
+      const counters = document.querySelectorAll('[data-count]');
+      const counterObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const target = parseInt(entry.target.dataset.count);
+            animateCounter(entry.target, target);
+            counterObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.5 });
 
-      window.addEventListener('scroll', function(){
-        if(!trGlowRaf) trGlowRaf = requestAnimationFrame(trUpdateGlow);
-      }, { passive:true });
+      counters.forEach(el => counterObserver.observe(el));
 
-      // ===== tests / sanity checks =====
-      console.assert(document.querySelectorAll('.product').length === 3, 'Exactly 3 product cards should exist');
-      console.assert(document.querySelectorAll('.productImageBtn').length === 3, 'Exactly 3 product buttons should exist');
-      console.assert(!!document.getElementById('tpl-online'), 'Template tpl-online should exist');
-      console.assert(!!document.getElementById('tpl-hybrid'), 'Template tpl-hybrid should exist');
-      console.assert(!!document.getElementById('tpl-engine'), 'Template tpl-engine should exist');
-      console.assert(!!document.getElementById('modelModal'), 'Modal #modelModal should exist');
-      console.assert(Object.keys(TR_MODEL_META).length === 3, 'TR_MODEL_META must have 3 keys');
-      console.assert(!!document.getElementById('mise'), 'Section #mise should exist');
-      console.assert(!!document.getElementById('modely'), 'Section #modely should exist');
-      console.assert(!!window.__talentRoomInit, 'Init guard should be set');
     })();
   </script>
 </body>
